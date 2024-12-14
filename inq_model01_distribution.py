@@ -47,10 +47,10 @@ def save_to_db():
 
     try:
         db = pymysql.connect(
-            host=st.secrets("DB_HOST"),
-            user=st.secrets("DB_USER"),
-            password=st.secrets("DB_PASSWORD"),
-            database=st.secrets("DB_DATABASE"),
+            host=st.secrets["DB_HOST"],
+            user=st.secrets["DB_USER"],
+            password=st.secrets["DB_PASSWORD"],
+            database=st.secrets["DB_DATABASE"],
             charset="utf8mb4",  # UTF-8 지원
             autocommit=True  # 자동 커밋 활성화
         )
@@ -213,10 +213,10 @@ def save_feedback_to_db(feedback):
 
     try:
         db = pymysql.connect(
-            host=st.secrets("DB_HOST"),
-            user=st.secrets("DB_USER"),
-            password=st.secrets("DB_PASSWORD"),
-            database=st.secrets("DB_DATABASE"),
+            host=st.secrets["DB_HOST"],
+            user=st.secrets["DB_USER"],
+            password=st.secrets["DB_PASSWORD"],
+            database=st.secrets["DB_DATABASE"],
             charset="utf8mb4",  # UTF-8 지원
             autocommit=True  # 자동 커밋 활성화
         )

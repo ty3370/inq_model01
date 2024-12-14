@@ -8,16 +8,16 @@ import pymysql
 load_dotenv()  # .env 파일 로드
 
 # 환경 변수 설정
-OPENAI_API_KEY = st.secrets('OPENAI_API_KEY')
+OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
 
 # MySQL에서 데이터 불러오기 함수
-def fetch_records():
-    db = pymysql.connect(
-        host=st.secrets("DB_HOST"),
-        user=st.secrets("DB_USER"),
-        password=st.secrets("DB_PASSWORD"),
-        database=st.secrets("DB_DATABASE"),
-        charset='utf8mb4'  # 문자 집합 설정
+def connect_to_db():
+    return pymysql.connect(
+        host=st.secrets["DB_HOST"],
+        user=st.secrets["DB_USER"],
+        password=st.secrets["DB_PASSWORD"],
+        database=st.secrets["DB_DATABASE"],
+        charset='utf8mb4'
     )
     cursor = db.cursor()
     
@@ -39,10 +39,10 @@ def fetch_records():
 # MySQL에서 특정 레코드 불러오기 함수
 def fetch_record_by_id(record_id):
     db = pymysql.connect(
-        host=st.secrets("DB_HOST"),
-        user=st.secrets("DB_USER"),
-        password=st.secrets("DB_PASSWORD"),
-        database=st.secrets("DB_DATABASE"),
+        host=st.secrets["DB_HOST"],
+        user=st.secrets["DB_USER"],
+        password=st.secrets["DB_PASSWORD"],
+        database=st.secrets["DB_DATABASE"],
         charset='utf8mb4'  # 문자 집합 설정
     )
     cursor = db.cursor()
@@ -58,7 +58,7 @@ st.title("학생의 인공지능 사용 내역(교사용)")
 # 비밀번호 입력
 password = st.text_input("비밀번호를 입력하세요", type="password")
 
-if password == st.secrets('PASSWORD'):  # 환경 변수에 저장된 비밀번호와 비교
+if password == st.secrets["PASSWORD"]:  # 환경 변수에 저장된 비밀번호와 비교
     # 저장된 레코드 불러오기
     records = fetch_records()
 
