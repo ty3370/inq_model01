@@ -185,12 +185,6 @@ def page_3():
     else:
         st.write("아직 최근 대화가 없습니다.")
 
-    # 다음 버튼 (저장 로직 제거)
-    st.write(" ")  # Add space to position the button at the bottom properly
-    if st.button("다음", key="page3_next_button"):
-        st.session_state["step"] = 4
-        st.rerun()
-
     # 누적 대화 출력
     st.subheader("📜 누적 대화 목록")
     if st.session_state["messages"]:
@@ -201,6 +195,12 @@ def page_3():
                 st.write(f"**과학탐구 도우미:** {message['content']}")
     else:
         st.write("아직 대화 기록이 없습니다.")
+
+    # 다음 버튼 (저장 로직 제거)
+    st.write(" ")  # Add space to position the button at the bottom properly
+    if st.button("다음", key="page3_next_button"):
+        st.session_state["step"] = 4
+        st.rerun()
 
 # 피드백 저장 함수
 def save_feedback_to_db(feedback):
