@@ -23,9 +23,7 @@ def fetch_records():
         query = """
         SELECT id, number, name, time 
         FROM qna
-        ORDER BY
-          CASE WHEN number >= 10300 AND number < 10400 THEN 0 ELSE 1 END,
-          number
+        ORDER BY time
         """
         cursor.execute(query)
         records = cursor.fetchall()
