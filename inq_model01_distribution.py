@@ -25,8 +25,10 @@ initial_prompt = (
     "학생에게 탐구를 안내하는 것은 두 단계로 진행됩니다. 1단계는 학생이 탐구와 관련해 궁금한 점을 질문하는 단계입니다. 2단계는 학생의 가설과 실험 과정에 대해 당신이 학생에게 질문하며 실험을 정교화하는 단계입니다."
     "1단계에서는 학생이 제시하는 질문에 답하면서, 그와 동시에 학생의 수준과 특성을 진단하세요. 예를 들어 학생이 탐구의 변인, 준비물, 관련 지식 등 세부 사항까지 세세하게 질문하는 학생인지, 또는 탐구의 가설과 과정에 대해서만 질문하는 학생인지, 또는 적절한 질문을 잘 하지 못하는 학생인지 등을 판단하세요."
     "학생이 궁금한 것을 다 물어봤다고 하거나, 더이상 질문이 없다고 한다면, 이제 학생이 생각한 실험 가설과 실험 과정을 써달라고 요청하세요. 이때 학생이 실험 가설과 실험 과정을 모르겠다고 하더라도, 절대 알려줘서는 안 됩니다. 간단하게라도 써 보도록 유도하세요."
-    "학생이 생각한 실험 가설과 과정을 쓰고 나면, 그것을 정교화하는 2단계로 넘어갑니다. 1단계에서 학생 수준과 특성을 진단한 결과를 바탕으로, 학생의 실험 가설과 과정에 대해 질문하며 정교화하세요. 예를 들어 탐구의 변인이나 준비물 등 세부 사항까지 질문하는 학생이라면 가설과 실험 과정에 대해 더 깊이 있는 논의가 이루어지도록 질문하고, 탐구의 가설과 과정에 대해서만 질문하는 학생이라면 변인이나 준비물 등의 세부 사항을 질문하고, 적절한 질문을 잘 하지 못한 학생이라면 변인 인식, 가설 설정, 실험 설계 등 탐구의 전반적인 과정을 질문을 통해 안내하세요."
+    "학생이 생각한 실험 가설과 과정을 쓰고 나면, 1단계에서 진단한 학생 수준과 특성에 대해 간단하게 피드백을 제공하세요."
+    "학생 수준과 특성에 대해 피드백을 제공한 후, 학생의 가설과 실험 과정을 정교화하는 2단계로 넘어갑니다. 1단계에서 학생 수준과 특성을 진단한 결과를 바탕으로, 학생의 실험 가설과 과정에 대해 질문하며 정교화하세요. 예를 들어 탐구의 변인이나 준비물 등 세부 사항까지 질문하는 학생이라면 가설과 실험 과정에 대해 더 깊이 있는 논의가 이루어지도록 질문하고, 탐구의 가설과 과정에 대해서만 질문하는 학생이라면 변인이나 준비물 등의 세부 사항을 질문하고, 적절한 질문을 잘 하지 못한 학생이라면 변인 인식, 가설 설정, 실험 설계 등 탐구의 전반적인 과정을 질문을 통해 안내하세요."
     "2단계에서는 최소 5번 이상 대화가 오가도록 하세요."
+    "2단계에서는 학생에게 여러 개의 내용을 한 번에 요구하면 학생이 대응하기 어려울 수 있으므로, 한 번에 하나의 내용만 요구하세요."
     "탐구의 변인, 가설, 과정에 관한 충분한 논의가 이루어지면, 학생에게 [다음] 버튼을 눌러 다음 단계로 진행하라고 이야기하세요. 단, [다음] 버튼은 필요한 논의가 모두 끝난 후에 눌러야 합니다. 그 전에는 [다음] 버튼을 누르지 말라고 안내하세요."
     "[다음] 버튼은 다음 세 가지 조건이 모두 충족됐을 때 누를 수 있습니다: ① 학생 수준과 특성이 진단되었다. ② 학생이 스스로 생각한 실험 가설과 과정을 제시했다. ③ 2단계에서 5회 이상 대화가 오갔다. 이 조건이 충족되지 않았다면, 절대로 [다음] 버튼을 누르라고 하면 안 됩니다."
     "한 번에 여러 질문을 하면 학생이 혼란스러워 할 수 있으니, 한 번에 하나의 질문만 하세요."
@@ -34,6 +36,7 @@ initial_prompt = (
     "어떤 상황에서든 절대로 실험 가설이나 실험 과정을 직접적으로 알려줘서는 안 됩니다. 당신이 할 일은 학생이 스스로 사고하여 실험 가설과 과정을 작성하도록 유도하는 것입니다."
     "학생이 실험 가설이나 과정을 모르겠다거나 못 쓰겠다고 하더라도 절대 알려주지 마세요. 간단하게라도 써 보도록 유도하세요."
     "당신의 역할은 정답을 알려주는 게 아니라, 학생이 사고하며 탐구를 설계하도록 교육적 지원을 하는 것입니다."
+    "학생에게 질문할 때는 한 번에 한 가지의 내용만 질문하세요."
 )
 
 # MySQL 저장 함수
@@ -61,14 +64,15 @@ def save_to_db():
         INSERT INTO qna (number, name, chat, time)
         VALUES (%s, %s, %s, %s)
         """
-        chat = json.dumps(st.session_state["messages"], ensure_ascii=False)  # 대화 내용을 JSON 문자열로 변환
+        # all_data를 JSON 문자열로 변환하여 저장
+        chat = json.dumps(all_data, ensure_ascii=False)  # 대화 및 피드백 내용 통합
+
         val = (number, name, chat, now)
 
         # SQL 실행
         cursor.execute(sql, val)
         cursor.close()
         db.close()
-        st.success("대화 내용 처리 중입니다.")
         return True  # 저장 성공
     except pymysql.MySQLError as db_err:
         st.error(f"DB 처리 중 오류가 발생했습니다: {db_err}")
@@ -129,13 +133,20 @@ def page_2():
         ⑤ 충분히 대화가 이루어지면 인공지능이 [다음] 버튼을 눌러도 된다고 알려줘요. 인공지능이 [다음] 버튼을 누르라고 했을 때 버튼을 누르세요!  
 
         위 내용을 충분히 숙지했다면, 아래의 [다음] 버튼을 눌러 진행해주세요.  
-        """
-    )
+        """)
 
-    st.write(" ")  # Add space to position the button at the bottom properly
-    if st.button("다음", key="page2_next_button"):
-        st.session_state["step"] = 3
-        st.rerun()
+    # 버튼
+    col1, col2 = st.columns([1, 1])
+
+    with col1:
+        if st.button("이전"):
+            st.session_state["step"] = 1
+            st.rerun()
+
+    with col2:
+        if st.button("다음", key="page2_next_button"):
+            st.session_state["step"] = 3
+            st.rerun()
 
 # 페이지 3: GPT와 대화
 def page_3():
@@ -196,11 +207,20 @@ def page_3():
     else:
         st.write("아직 대화 기록이 없습니다.")
 
-    # 다음 버튼 (저장 로직 제거)
-    st.write(" ")  # Add space to position the button at the bottom properly
-    if st.button("다음", key="page3_next_button"):
-        st.session_state["step"] = 4
-        st.rerun()
+    col1, col2 = st.columns([1, 1])
+
+    # 이전 버튼
+    with col1:
+        if st.button("이전"):
+            st.session_state["step"] = 2
+            st.rerun()
+
+    # 다음 버튼
+    with col2:
+        if st.button("다음", key="page3_next_button"):
+            st.session_state["step"] = 4
+            st.session_state["feedback_saved"] = False  # 피드백 재생성 플래그 초기화
+            st.rerun()
 
 # 피드백 저장 함수
 def save_feedback_to_db(feedback):
@@ -247,14 +267,12 @@ def page_4():
     st.title("탐구 도우미의 제안")
     st.write("탐구 도우미가 대화 내용을 정리 중입니다. 잠시만 기다려주세요.")
 
-    # 피드백 생성 및 대화에 추가
-    if "experiment_plan" not in st.session_state:
-        # 대화 히스토리 정리
-        chat_history = "\n".join(
-            f"{msg['role']}: {msg['content']}" for msg in st.session_state["messages"]
-        )
+    # 페이지 4로 돌아올 때마다 새로운 피드백 생성
+    if not st.session_state.get("feedback_saved", False):
+        # 대화 기록을 기반으로 탐구 계획 작성
+        chat_history = "\n".join(f"{msg['role']}: {msg['content']}" for msg in st.session_state["messages"])
         prompt = f"다음은 학생과 과학탐구 도우미의 대화 기록입니다:\n{chat_history}\n\n"
-        prompt += "위 대화를 바탕으로, 다음 내용을 포함해 탐구 내용과 피드백을 작성하세요: 1. 대화 내용을 종합해 도출한 탐구 가설 및 과정, 2. 학생이 제시한 탐구 가설 및 과정에서 수정한 부분과 수정한 이유, 3. 학생의 탐구 능력에 관한 피드백(강점과 개선점 등), 4. 예상 결과(주제와 관련된 과학적 이론과 실험 오차를 고려해, 실험 과정을 그대로 수행했을 때 나올 실험 결과를 표 등으로 제시해주세요. 이때 결과 관련 설명은 제시하지 말고, 결과만 제시하세요)."
+        prompt += "대화 기록에 [다음] 버튼을 눌러도 된다는 대화가 포함되어 있는지 확인하세요. 포함되지 않았다면, '[이전] 버튼을 눌러 과학탐구 도우미와 더 대화해야 합니다'라고 출력하세요. 대화 기록에 [다음] 버튼을 눌러도 된다는 대화가 포함되었다면, 대화 기록을 바탕으로, 다음 내용을 포함해 탐구 내용과 피드백을 작성하세요: 1. 대화 내용을 종합해 도출한 탐구 가설 및 과정, 2. 학생이 제시한 탐구 가설 및 과정에서 수정한 부분과 수정한 이유, 3. 학생의 탐구 능력에 관한 피드백(강점과 개선점 등), 4. 예상 결과(주제와 관련된 과학적 이론과 실험 오차를 고려해, 실험 과정을 그대로 수행했을 때 나올 실험 결과를 표 등으로 제시해주세요. 이때 결과 관련 설명은 제시하지 말고, 결과만 제시하세요)."
 
         # OpenAI API 호출
         response = client.chat.completions.create(
@@ -263,23 +281,34 @@ def page_4():
         )
         st.session_state["experiment_plan"] = response.choices[0].message.content
 
-        # 피드백을 대화 히스토리에 추가
-        st.session_state["messages"].append({"role": "assistant", "content": st.session_state["experiment_plan"]})
+    # 피드백 출력
+    st.subheader("📋 생성된 피드백")
+    st.write(st.session_state["experiment_plan"])
+
+    # 새로운 변수에 대화 내용과 피드백을 통합
+    if "all_data" not in st.session_state:
+        st.session_state["all_data"] = []
+
+    all_data_to_store = st.session_state["messages"] + [{"role": "assistant", "content": st.session_state["experiment_plan"]}]
 
     # 중복 저장 방지: 피드백 저장 여부 확인
     if "feedback_saved" not in st.session_state:
         st.session_state["feedback_saved"] = False  # 초기화
 
     if not st.session_state["feedback_saved"]:
-        if save_to_db():  # 기존 save_to_db 함수 재활용
+        # 새로운 데이터(all_data_to_store)를 MySQL에 저장
+        if save_to_db(all_data_to_store):  # 기존 save_to_db 함수에 통합된 데이터 전달
             st.session_state["feedback_saved"] = True  # 저장 성공 시 플래그 설정
-            st.success("대화와 피드백이 성공적으로 저장되었습니다.")
         else:
             st.error("저장에 실패했습니다. 다시 시도해주세요.")
 
-    # 피드백 출력
-    st.subheader("📋 생성된 피드백")
-    st.write(st.session_state["experiment_plan"])
+    # 이전 버튼 (페이지 3으로 이동 시 피드백 삭제)
+    if st.button("이전", key="page4_back_button"):
+        st.session_state["step"] = 3
+        if "experiment_plan" in st.session_state:
+            del st.session_state["experiment_plan"]  # 피드백 삭제
+        st.session_state["feedback_saved"] = False  # 피드백 재생성 플래그 초기화
+        st.rerun()
 
 # 메인 로직
 if "step" not in st.session_state:
