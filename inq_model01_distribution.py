@@ -40,7 +40,7 @@ initial_prompt = (
 )
 
 # MySQL 저장 함수
-def save_to_db():
+def save_to_db(all_data):
     number = st.session_state.get('user_number', '').strip()
     name = st.session_state.get('user_name', '').strip()
 
