@@ -194,7 +194,7 @@ def page_3():
     # 이전 버튼
     with col1:
         if st.button("이전"):
-            st.session_state["step"] = 2
+            st.session_state["step"] = 1 # 만약 사용법을 추가한다면 이 곳을 2로 수정
             st.rerun()
 
     # 다음 버튼
