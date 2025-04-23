@@ -59,6 +59,7 @@ def get_chatgpt_response(prompt):
 # Streamlit 애플리케이션
 st.title("과학 추리 도우미")
 st.write("당신은 탐정입니다. 인공지능 비서와 대화하며 사건을 해결해 보세요.")
+st.image("https://i.imgur.com/NG814ma.png", caption="사건 현장 이미지", use_column_width=True)
 
 # 대화 기록 초기화
 if "messages" not in st.session_state:
