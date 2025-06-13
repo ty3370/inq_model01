@@ -26,6 +26,7 @@ initial_prompt = (
     "학생이 과학적 개념과 이해는 있으나 그래프를 해석하지 못한다고 판단된다면, 포화수증기량 곡선에 관한 다음과 같은 예시 문항을 만들어 어떤 부분을 어려워 하는지 확인하세요: A지점의 기온은?(답 20℃) A지점의 실제수증기량은?(답 7g/kg) A지점의 포화수증기량은?(답 14g/kg) 등등"
     "학생이 모르는 부분에 대해선 초보적인 중학생 수준에 맞추어 쉽고 간단하게 설명하세요."
     "학생을 안내하며 정답에 도달할 수 있도록 지도하세요. 단, 어떤 경우에도 직접적으로 답을 말하지 마세요. 학생이 스스로 알아낼 수 있도록 유도하세요."
+    "학생이 정답에 도달했다고 판단되면 [다음] 버튼을 누르라고 안내하세요."
     "학생에게 질문할 때는 한 번에 한 가지의 내용만 질문하세요. 모든 대화는 한 줄 이내로 최소화하세요."
 )
 
@@ -34,8 +35,8 @@ def save_to_db(all_data):
     number = st.session_state.get('user_number', '').strip()
     name = st.session_state.get('user_name', '').strip()
 
-    if not number or not name:  # 학번과 이름 확인
-        st.error("사용자 학번과 이름을 입력해야 합니다.")
+    if not number or not name:
+        st.error("사용자 이름과 식별번호를 입력해야 합니다.")
         return False  # 저장 실패
 
     try:
@@ -84,23 +85,23 @@ def get_chatgpt_response(prompt):
     st.session_state["messages"].append({"role": "assistant", "content": answer})
     return answer
 
-# 페이지 1: 학번 및 이름 입력
+# 페이지 1: 이름 입력
 def page_1():
     st.title("포화수증기량 도우미")
-    st.write("학번과 이름을 입력한 뒤 '다음' 버튼을 눌러주세요.")
+    st.write("이름과 식별번호를 입력한 뒤 '다음' 버튼을 눌러주세요.")
 
     if "user_number" not in st.session_state:
         st.session_state["user_number"] = ""
     if "user_name" not in st.session_state:
         st.session_state["user_name"] = ""
 
-    st.session_state["user_number"] = st.text_input("학번", value=st.session_state["user_number"])
-    st.session_state["user_name"] = st.text_input("이름", value=st.session_state["user_name"])
+    st.session_state["user_number"] = st.text_input("이름", value=st.session_state["user_number"])
+    st.session_state["user_name"] = st.text_input("식별번호(비밀번호)", value=st.session_state["user_name"])
 
     st.write(" ")  # Add space to position the button at the bottom properly
     if st.button("다음", key="page1_next_button"):
         if st.session_state["user_number"].strip() == "" or st.session_state["user_name"].strip() == "":
-            st.error("학번과 이름을 모두 입력해주세요.")
+            st.error("이름과 식별번호를 모두 입력해주세요.")
         else:
             st.session_state["step"] = 3
             st.rerun()
@@ -136,9 +137,9 @@ def page_3():
     st.write("아래 문제의 답안을 입력하세요.")
     st.image("https://i.imgur.com/Kp0WhBH.png", use_container_width=True)
 
-    # 학번과 이름 확인
+    # 이름 확인
     if not st.session_state.get("user_number") or not st.session_state.get("user_name"):
-        st.error("학번과 이름이 누락되었습니다. 다시 입력해주세요.")
+        st.error("이름과 식별번호가 누락되었습니다. 다시 입력해주세요.")
         st.session_state["step"] = 1
         st.rerun()
 
@@ -210,8 +211,8 @@ def save_feedback_to_db(feedback):
     number = st.session_state.get('user_number', '').strip()
     name = st.session_state.get('user_name', '').strip()
 
-    if not number or not name:  # 학번과 이름 확인
-        st.error("사용자 학번과 이름을 입력해야 합니다.")
+    if not number or not name:  # 이름 확인
+        st.error("사용자 이름과 식별번호를 입력해야 합니다.")
         return False  # 저장 실패
 
     try:
