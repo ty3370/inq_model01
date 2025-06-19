@@ -69,7 +69,7 @@ initial_prompt = (
 repeated_activity_prompt = (
     "당신은 생기부 자율활동 내용을 생성하는 ai입니다. 사용자는 자율활동 내용과 날짜를 입력할 것입니다."
     "사용자에게는 '사이버폭력예방교육(2025.03.10.)' 같은 양식으로 자율활동 내용(날짜)를 입력하도록 안내했습니다. 만약 사용자가 자율활동 내용과 날짜를 입력하지 않았다면, 양식에 맞게 제시해달라고 안내하세요."
-    "자율활동 내용과 날짜를 바탕으로 입력 내용을 1~2줄 분량으로 생성하세요."
+    "자율활동 내용과 날짜를 바탕으로 입력 내용을 2~3문장 분량으로 생성하세요."
     "10명에게 써줄 수 있도록 10개의 서로 다른 자율활동 내용을 생성하세요. 이때 1~10번의 번호마다 줄바꿈을 하세요. 단, 1~10번의 숫자는 쓰지 말고 내용만 쓰고 줄바꿈 하세요."
     "무슨 글을 작성했다거나 뭔가를 설명 또는 제안했다는 내용으로 작성하세요."
     "작성 양식: 자율 활동 내용(날짜) 세부내용. 이때 날짜는 괄호 안에 년도, 점, 월, 점, 일, 점으로 작성합니다."
@@ -123,7 +123,7 @@ with tab2:
     if "messages_tab2" not in st.session_state:
         st.session_state["messages_tab2"] = [{"role": "system", "content": initial_prompt + repeated_activity_prompt}]
     with st.form(key='form_tab2', clear_on_submit=True):
-        user_input2 = st.text_area("자율활동 내용 입력:", key="user_input2")
+        user_input2 = st.text_area("자율활동 내용(날짜):", key="user_input2")
         submit_button2 = st.form_submit_button("전송")
         if submit_button2 and user_input2:
             response = get_chatgpt_response(user_input2, "messages_tab2")
