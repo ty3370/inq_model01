@@ -95,7 +95,7 @@ def get_chatgpt_response(prompt, key):
 
 # Streamlit 앱
 st.title("생기부 작성 챗봇")
-tab1, tab2 = st.tabs(["일반 생기부 생성", "자율활동 반복생기부 생성"])
+tab1, tab2 = st.tabs(["일반 생기부 생성", "자율활동 10건 일괄 생성"])
 
 # 탭 1
 with tab1:
@@ -118,7 +118,7 @@ with tab1:
 
 # 탭 2
 with tab2:
-    st.subheader("자율활동 반복생기부 생성")
+    st.subheader("자율활동 10건 일괄 생성")
     st.info("자율활동 내용과 날짜를 입력하면 10개의 생기부 내용을 생성합니다.\n\n예) 사이버폭력예방교육(2025.03.10.) ← 이런 양식으로 작성하세요.")
     if "messages_tab2" not in st.session_state:
         st.session_state["messages_tab2"] = [{"role": "system", "content": initial_prompt + repeated_activity_prompt}]
@@ -128,7 +128,7 @@ with tab2:
         if submit_button2 and user_input2:
             response = get_chatgpt_response(user_input2, "messages_tab2")
             st.write(f"**생기부봇:** {response}")
-    st.subheader("대화 기록 (자율활동 반복)")
+    st.subheader("대화 기록 (자율활동 10건)")
     for message in st.session_state["messages_tab2"]:
         if message["role"] == "user":
             st.write(f"**You:** {message['content']}")
