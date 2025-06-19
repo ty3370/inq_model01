@@ -65,40 +65,61 @@ initial_prompt = (
     "교사가 관찰 가능한 내용만 작성해야 합니다. 예를 들어, '생각함' 대신 '생각했다고 진술함', '깨달음' 대신 '깨달았다고 보고서를 작성함', '알게 됨' 대신 '알게 되었다고 발표함' 등 교사가 관찰할 수 있는 내용으로 써야 합니다."
 )
 
-# 챗봇 응답 함수
+# 자율활동 반복 생기부용 추가 프롬프트
+repeated_activity_prompt = (
+    "당신은 생기부 자율활동 내용을 생성하는 ai입니다. 사용자는 자율활동 내용과 날짜를 입력할 것입니다."
+    "자율활동 내용과 날짜를 바탕으로 입력 내용을 1~2줄 분량으로 생성하세요."
+    "30명에게 써줄 수 있도록 30개의 서로 다른 자율활동 내용을 생성하세요. 이때 1~30번의 번호마다 줄바꿈을 하세요. 단, 1~30번의 숫자는 쓰지 말고 내용만 쓰고 줄바꿈 하세요."
+    "무슨 글을 작성했다거나 뭔가를 설명 또는 제안했다는 내용으로 작성하세요."
+    "예시 1) 사이버폭력예방교육(2025.03.10.)에서 온라인 공간에서의 예절 중요성을 알게 되었다고 언급하며, 구체적인 사례를 들어 설명함."
+    "예시 2) 학생인성교육/디지털시민교육(2025.05.07.)에서 디지털 기기 사용 중독 예방 방안에 대해 제안함."
+    "예시 3) 성폭력예방교육(2025.05.09.)에서 경청의 중요성을 강조하며 친구들과의 협력을 제안함."
+)
+
+# GPT 응답 함수
 def get_chatgpt_response(prompt):
     st.session_state["messages"].append({"role": "user", "content": prompt})
-
     response = client.chat.completions.create(
         model=MODEL,
-        messages=st.session_state["messages"],
+        messages=st.session_state["messages"]
     )
-    
     answer = response.choices[0].message.content
     st.session_state["messages"].append({"role": "assistant", "content": answer})
-
     return answer
 
-# Streamlit 애플리케이션
+# Streamlit 앱
 st.title("생기부 작성 챗봇")
 
-# 대화 기록 초기화
-if "messages" not in st.session_state:
-    st.session_state["messages"] = [{"role": "system", "content": initial_prompt}]
+# 탭 구성
+tab1, tab2 = st.tabs(["일반 생기부 생성", "자율활동 반복생기부 생성"])
 
-# 입력 필드와 전송 버튼
-with st.form(key='chat_form', clear_on_submit=True):
-    user_input = st.text_area("You: ", key="user_input")
-    submit_button = st.form_submit_button(label='전송')
+# 탭1 - 일반 생기부
+with tab1:
+    st.subheader("일반 생기부 생성")
+    if "messages" not in st.session_state:
+        st.session_state["messages"] = [{"role": "system", "content": initial_prompt}]
+    with st.form(key='form_tab1', clear_on_submit=True):
+        user_input1 = st.text_area("내용 입력:", key="user_input1")
+        submit_button1 = st.form_submit_button("전송")
+        if submit_button1 and user_input1:
+            response = get_chatgpt_response(user_input1)
+            st.write(f"**생기부봇:** {response}")
 
-    if submit_button and user_input:
-        # 사용자 입력 저장 및 챗봇 응답 생성
-        response = get_chatgpt_response(user_input)
-        st.write(f"**생기부봇:** {response}")
+# 탭2 - 자율활동 반복생기부
+with tab2:
+    st.subheader("자율활동 반복생기부 생성")
+    st.info("자율활동 내용과 날짜를 입력하면 30개의 생기부 내용을 생성합니다.\n예) 사이버폭력예방교육(2025.03.10.)")
+    with st.form(key='form_tab2', clear_on_submit=True):
+        user_input2 = st.text_area("자율활동 내용 입력:", key="user_input2")
+        submit_button2 = st.form_submit_button("전송")
+        if submit_button2 and user_input2:
+            st.session_state["messages"] = [{"role": "system", "content": initial_prompt + repeated_activity_prompt}]
+            response = get_chatgpt_response(user_input2)
+            st.write(f"**생기부봇:** {response}")
 
 # 대화 기록 출력
 if "messages" in st.session_state:
-    st.subheader("[누적 대화 목록]")  # 제목 추가
+    st.subheader("누적 대화 목록")
     for message in st.session_state["messages"]:
         if message["role"] == "user":
             st.write(f"**You:** {message['content']}")
