@@ -1,18 +1,16 @@
-import pymysql
 import streamlit as st
 from openai import OpenAI
 import os
-import json
 from dotenv import load_dotenv
-from datetime import datetime
 
 # 환경 변수 로드
 load_dotenv()
 
+# OpenAI API 키 및 모델 설정
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
-MODEL = 'gpt-4o'
+MODEL = 'gpt-4.1'
 
-# OpenAI API 키 설정
+# OpenAI API 클라이언트 초기화
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 # 초기 프롬프트 설정
@@ -57,83 +55,34 @@ def get_chatgpt_response(prompt):
     )
     
     answer = response.choices[0].message.content
-    print(answer)
-    
-    st.session_state["messages"].append({"role": "assistant", "content": answer})    
+    st.session_state["messages"].append({"role": "assistant", "content": answer})
 
     return answer
 
-# MySQL에 대화 내용 저장 함수
-def save_to_db():
-    number = st.session_state.get('user_number', '').strip()
-    name = st.session_state.get('user_name', '').strip()
-
-    if name == '' or number == '':
-        st.error("사용자 학번과 이름을 입력해야 합니다.")
-        return
-    
-    db = pymysql.connect(
-            host=st.secrets["DB_HOST"],
-            user=st.secrets["DB_USER"],
-            password=st.secrets["DB_PASSWORD"],
-            database=st.secrets["DB_DATABASE"],
-    )
-    cursor = db.cursor()
-    now = datetime.now()
-
-    sql = """
-    INSERT INTO qna (number, name, chat, time)
-    VALUES (%s, %s, %s, %s)
-    """
-    chat = json.dumps(st.session_state["messages"])  # 대화 내용을 JSON 문자열로 변환
-    val = (number, name, chat, now)
-    cursor.execute(sql, val)
-    db.commit()
-    cursor.close()
-    db.close()
-    st.success("사용해주셔서 감사합니다.")
-
 # Streamlit 애플리케이션
-st.title("보라중학교 과학탐구 도우미 챗봇")
-st.write("2024학년도 2학기 보라중학교 과학탐구 수업을 돕기 위한 챗봇입니다. 학번과 이름을 입력한 뒤 [정보 입력] 버튼을 클릭하고 사용하시면 됩니다. 채팅이 끝나면 제일 아래에 [사용 완료] 버튼을 눌러주세요.")
-
-# 사용자 정보 입력 폼
-with st.form(key='user_info_form'):
-    user_number = st.text_input("학번", key="user_number")
-    user_name = st.text_input("이름", key="user_name")
-    user_info_submit = st.form_submit_button(label='정보 입력')
+st.title("과학 추리 도우미")
+st.write("당신은 탐정입니다. 인공지능 비서와 대화하며 사건을 해결해 보세요.")
+st.image("https://i.imgur.com/KRvJ4GU.png", use_container_width=True)
 
 # 대화 기록 초기화
 if "messages" not in st.session_state:
     st.session_state["messages"] = [{"role": "system", "content": initial_prompt}]
 
-# Submit 버튼을 눌렀을 때 초기 대화를 시작
-if user_info_submit:
-    get_chatgpt_response("")
+# 입력 필드와 전송 버튼
+with st.form(key='chat_form', clear_on_submit=True):
+    user_input = st.text_area("You: ", key="user_input")
+    submit_button = st.form_submit_button(label='전송')
+
+    if submit_button and user_input:
+        # 사용자 입력 저장 및 챗봇 응답 생성
+        response = get_chatgpt_response(user_input)
+        st.write(f"**인공지능 비서:** {response}")
 
 # 대화 기록 출력
 if "messages" in st.session_state:
+    st.subheader("[누적 대화 목록]")  # 제목 추가
     for message in st.session_state["messages"]:
         if message["role"] == "user":
             st.write(f"**You:** {message['content']}")
         elif message["role"] == "assistant":
             st.write(f"**인공지능 비서:** {message['content']}")
-
-# 폼을 사용하여 입력 필드와 버튼 그룹화
-if "user_name" in st.session_state and "user_number" in st.session_state:
-    with st.form(key='my_form', clear_on_submit=True):
-        user_input = st.text_area("You: ", key="user_input")
-        submit_button = st.form_submit_button(label='전송')
-
-        if submit_button and user_input:
-            # 사용자 입력 저장 및 챗봇 응답 생성
-            get_chatgpt_response(user_input)
-            st.rerun()  # 상태 업데이트 후 즉시 리렌더링
-
-# "사용 완료" 버튼
-if "user_name" in st.session_state and "user_number" in st.session_state:
-    if st.button("사용 완료"):
-        save_to_db()
-
-# 새로운 메시지가 추가되면 스크롤을 맨 아래로 이동
-st.write('<script>window.scrollTo(0, document.body.scrollHeight);</script>', unsafe_allow_html=True)
