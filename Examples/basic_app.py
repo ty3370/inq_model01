@@ -44,22 +44,6 @@ if "messages" not in st.session_state:
 
 st.subheader("💬 대화 로그")
 
-st.markdown("""
-<style>
-.stApp {
-    background-image:
-        linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)),
-        url("https://i.imgur.com/8epnNuh.png");
-    background-repeat: repeat;
-    background-size: auto, 200px;
-}
-
-div[data-testid="stVerticalBlock"] div[style*="overflow"] {
-    background-color: white !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
 chat_container = st.container(height=350)
 
 for m in st.session_state["messages"]:
