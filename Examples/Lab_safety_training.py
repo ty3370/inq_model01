@@ -129,10 +129,13 @@ def page_investigation():
 
     st.markdown("""
         <style>
-        div[data-testid="stTabs"] button {
-            font-size: 280px !important;
+
+        /* 탭 텍스트가 들어있는 p 태그 직접 지정 */
+        div[data-testid="stTabs"] p {
+            font-size: 32px !important;
             font-weight: 900 !important;
         }
+
         </style>
     """, unsafe_allow_html=True)
 
