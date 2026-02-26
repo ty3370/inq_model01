@@ -8,14 +8,14 @@ load_dotenv()
 
 # OpenAI API 키 및 모델 설정
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
-MODEL = 'gpt-4o'
+MODEL = 'gpt-5-mini'
 
 # OpenAI API 클라이언트 초기화
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 # 초기 프롬프트 설정
 initial_prompt = (
-    "당신은 보라중학교 학생들을 돕기 위한 수업용 언어 모델입니다."
+    "당신은 보라고등학교 학생들을 돕기 위한 수업용 언어 모델입니다."
     "한국어로 대화하세요."
     "존대말로 대화하세요."
 )
@@ -35,7 +35,7 @@ def get_chatgpt_response(prompt):
     return answer
 
 # Streamlit 애플리케이션
-st.title("보라중학교 수업용 언어 모델")
+st.title("보라고등학교 수업용 언어 모델")
 
 # 대화 기록 초기화
 if "messages" not in st.session_state:
