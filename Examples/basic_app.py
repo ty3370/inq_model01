@@ -53,6 +53,10 @@ st.markdown("""
     background-repeat: repeat;
     background-size: auto, 200px;
 }
+
+div[style*="height: 350px"] {
+    background-color: white;
+}
 </style>
 """, unsafe_allow_html=True)
 
