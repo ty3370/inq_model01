@@ -132,7 +132,7 @@ def page_investigation():
 
         /* 탭 텍스트가 들어있는 p 태그 직접 지정 */
         div[data-testid="stTabs"] p {
-            font-size: 24px !important;
+            font-size: 18px !important;
             font-weight: 900 !important;
         }
 
