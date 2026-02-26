@@ -42,8 +42,6 @@ st.title("보라고등학교 수업용 언어 모델")
 if "messages" not in st.session_state:
     st.session_state["messages"] = [{"role": "system", "content": initial_prompt}]
 
-st.subheader("💬 Chat")
-
 chat_container = st.container(height=350)
 
 for m in st.session_state["messages"]:
