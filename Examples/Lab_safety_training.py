@@ -134,6 +134,13 @@ def page_investigation():
             margin-bottom: 2px !important;
         }
 
+        div[data-testid="stVerticalBlock"]:has(div[data-testid="stChatMessage"]) {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 350px;
+        }
+
         </style>
     """, unsafe_allow_html=True)
 
@@ -161,7 +168,7 @@ def page_investigation():
                     speaker = "조사관"
                     role_style = "user"
 
-                with chat_container.chat_message(role_style):
+                with chat_container:
                     st.markdown(f"**{speaker}:** {m['content']}")
 
             user_input = st.chat_input(
