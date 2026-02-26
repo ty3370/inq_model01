@@ -129,12 +129,6 @@ def page_investigation():
             font-weight: 900 !important;
         }
 
-        div[data-testid="stChatMessage"] {
-            padding-top: 4px !important;
-            padding-bottom: 4px !important;
-            margin-bottom: 4px !important;
-        }
-
         div[data-testid="stChatMessage"] p {
             font-size: 14px !important;
             margin-bottom: 2px !important;
