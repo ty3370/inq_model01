@@ -48,21 +48,17 @@ chat_container = st.container(height=350)
 
 st.markdown("""
 <style>
+div[data-testid="stVerticalBlock"] div[data-testid="stChatMessage"] {
+    background-color: rgba(255,255,255,0.7);
+}
 
-/* chat_container 영역만 선택 */
-div[data-testid="stVerticalBlock"] > div:nth-of-type(2) {
+div[data-testid="stVerticalBlock"] div[data-testid="stVerticalBlock"]:has(div[data-testid="stChatMessage"]) {
     background-image: url("https://i.imgur.com/8epnNuh.png");
     background-size: 55%;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: local;
 }
-
-/* 메시지 박스를 더 투명하게 */
-[data-testid="stChatMessage"] {
-    background-color: rgba(255,255,255,0.7);
-}
-
 </style>
 """, unsafe_allow_html=True)
 
