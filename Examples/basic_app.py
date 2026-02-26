@@ -44,7 +44,7 @@ if "messages" not in st.session_state:
 
 st.subheader("💬 Chat")
 
-chat_container = st.container(height=420)
+chat_container = st.container(height=350)
 
 for m in st.session_state["messages"]:
     if m["role"] == "system":
