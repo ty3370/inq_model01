@@ -14,6 +14,11 @@ MODEL = 'gpt-5-mini'
 # OpenAI API 클라이언트 초기화
 client = OpenAI(api_key=OPENAI_API_KEY)
 
+st.set_page_config(
+    page_title="보라고등학교 수업용 언어 모델",
+    page_icon="https://i.imgur.com/8epnNuh.png"
+)
+
 # 초기 프롬프트 설정
 initial_prompt = (
     "당신은 보라고등학교 학생들을 돕기 위한 수업용 언어 모델입니다."
