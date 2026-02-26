@@ -114,18 +114,6 @@ def page_intro():
 
 def page_investigation():
 
-    st.markdown("""
-        <style>
-
-        /* st.tabs 영역 안에 있는 버튼만 */
-        div[data-testid="stTabs"] button[role="tab"] {
-            font-size: 26px !important;
-            font-weight: 800 !important;
-        }
-
-        </style>
-    """, unsafe_allow_html=True)
-
     st.title("🔎 실험실 폭발 사고 조사")
 
     if st.button("◀ 이전 화면으로 돌아가기"):
@@ -138,6 +126,15 @@ def page_investigation():
         "학생 C",
         "사건 현장"
     ])
+
+    st.markdown("""
+        <style>
+        div[data-testid="stTabs"] button {
+            font-size: 28px !important;
+            font-weight: 900 !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)
 
     for i, agent_name in enumerate(PROMPT_MAP.keys()):
         with tabs[i]:
