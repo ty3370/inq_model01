@@ -108,7 +108,7 @@ def page_intro():
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-        btn_col1, btn_col2, btn_col3 = st.columns([2, 1, 2])
+        btn_col1, btn_col2, btn_col3 = st.columns([1, 2, 1])
         with btn_col2:
             if st.button("▶ 조사 시작하기"):
                 st.session_state["page"] = 2
