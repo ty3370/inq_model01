@@ -46,17 +46,35 @@ st.subheader("💬 대화 로그")
 
 st.markdown("""
 <style>
-[data-testid="stVerticalBlock"] {
-    background-image: url("https://i.imgur.com/8epnNuh.png");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: local;
+
+/* 채팅 컨테이너에만 배경 적용 */
+div[data-testid="stVerticalBlock"] > div:has(div[data-testid="stChatMessage"]) {
+    position: relative;
 }
 
-[data-testid="stChatMessage"] {
-    background-color: rgba(255,255,255,0.85);
+div[data-testid="stVerticalBlock"] > div:has(div[data-testid="stChatMessage"])::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("https://i.imgur.com/8epnNuh.png");
+    background-size: 60%;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.15;
+    z-index: 0;
 }
+
+/* 채팅 메시지가 배경 위에 오도록 */
+div[data-testid="stVerticalBlock"] > div:has(div[data-testid="stChatMessage"]) * {
+    position: relative;
+    z-index: 1;
+}
+
+/* 메시지 박스 약간 더 투명 */
+[data-testid="stChatMessage"] {
+    background-color: rgba(255,255,255,0.75);
+}
+
 </style>
 """, unsafe_allow_html=True)
 
