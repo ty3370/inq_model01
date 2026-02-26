@@ -48,16 +48,16 @@ chat_container = st.container(height=350)
 
 st.markdown("""
 <style>
-div[data-testid="stVerticalBlock"] div[data-testid="stChatMessage"] {
-    background-color: rgba(255,255,255,0.7);
-}
-
-div[data-testid="stVerticalBlock"] div[data-testid="stVerticalBlock"]:has(div[data-testid="stChatMessage"]) {
+div[data-testid="stVerticalBlock"] div[style*="overflow: auto"] {
     background-image: url("https://i.imgur.com/8epnNuh.png");
     background-size: 55%;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: local;
+}
+
+[data-testid="stChatMessage"] {
+    background-color: rgba(255,255,255,0.7);
 }
 </style>
 """, unsafe_allow_html=True)
