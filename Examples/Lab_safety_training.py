@@ -116,11 +116,14 @@ def page_investigation():
 
     st.markdown("""
         <style>
-        .stTabs [role="tab"] {
-            font-size: 24px !important;
-            font-weight: 700 !important;
-            padding: 10px 20px !important;
+
+        /* 탭 전체 영역 */
+        div[data-testid="stTabs"] button {
+            font-size: 26px !important;
+            font-weight: 800 !important;
+            padding: 12px 24px !important;
         }
+
         </style>
     """, unsafe_allow_html=True)
 
