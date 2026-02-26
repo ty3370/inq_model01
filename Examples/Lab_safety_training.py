@@ -134,6 +134,13 @@ def page_investigation():
             margin-bottom: 2px !important;
         }
 
+        div[data-testid="stVerticalBlock"] > div:has(div[data-testid="stChatMessage"]) {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 350px;
+        }
+
         </style>
     """, unsafe_allow_html=True)
 
@@ -148,7 +155,7 @@ def page_investigation():
                     {"role": "system", "content": PROMPT_MAP[agent_name]}
                 ]
 
-            chat_container = st.container(height=350)
+            chat_container = st.container()
 
             for m in st.session_state[session_key]:
                 if m["role"] == "system":
