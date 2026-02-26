@@ -16,7 +16,7 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 
 st.set_page_config(
     page_title="보라고등학교 수업용 언어 모델",
-    page_icon="https://i.imgur.com/8epnNuh.png"
+    page_icon="https://i.imgur.com/BW1HzjZ.png"
 )
 
 # 초기 프롬프트 설정
