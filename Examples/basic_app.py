@@ -44,58 +44,13 @@ if "messages" not in st.session_state:
 
 st.subheader("💬 Chat")
 
-# ===== 채팅 로그 박스 =====
-chat_html = """
-<div style="
-    height: 500px;
-    overflow-y: auto;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    background-color: #fafafa;
-">
-"""
+chat_container = st.container(height=420)
 
-for message in st.session_state["messages"]:
-    if message["role"] == "system":
+for m in st.session_state["messages"]:
+    if m["role"] == "system":
         continue
-
-    content = html.escape(message["content"]).replace("\n", "<br>")
-
-    if message["role"] == "user":
-        chat_html += f"""
-        <div style="text-align: right; margin-bottom: 10px;">
-            <div style="
-                display: inline-block;
-                padding: 10px 14px;
-                background-color: #DCF8C6;
-                border-radius: 15px;
-                max-width: 70%;
-            ">
-                {content}
-            </div>
-        </div>
-        """
-    else:
-        chat_html += f"""
-        <div style="text-align: left; margin-bottom: 10px;">
-            <div style="
-                display: inline-block;
-                padding: 10px 14px;
-                background-color: #FFFFFF;
-                border-radius: 15px;
-                border: 1px solid #eee;
-                max-width: 70%;
-            ">
-                {content}
-            </div>
-        </div>
-        """
-
-chat_html += "</div>"
-
-st.markdown(chat_html, unsafe_allow_html=True)
-# ===== 박스 끝 =====
+    with chat_container.chat_message(m["role"]):
+        st.markdown(m["content"])
 
 user_input = st.chat_input("메시지를 입력하세요")
 
