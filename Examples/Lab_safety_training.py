@@ -130,7 +130,7 @@ def page_investigation():
     st.markdown("""
         <style>
         div[data-testid="stTabs"] button {
-            font-size: 28px !important;
+            font-size: 280px !important;
             font-weight: 900 !important;
         }
         </style>
@@ -164,7 +164,7 @@ def page_investigation():
                     st.markdown(f"**{speaker}:** {m['content']}")
 
             user_input = st.chat_input(
-                f"{agent_name}에게 질문하기",
+                f"{agent_name} 조사하기",
                 key=f"input_{agent_name}"
             )
 
