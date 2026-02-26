@@ -47,18 +47,11 @@ st.subheader("💬 대화 로그")
 st.markdown("""
 <style>
 .stApp {
-    position: relative;
-}
-
-.stApp::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background-image: url("https://i.imgur.com/8epnNuh.png");
+    background-image:
+        linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)),
+        url("https://i.imgur.com/8epnNuh.png");
     background-repeat: repeat;
-    background-size: 200px;
-    opacity: 0.15;
-    z-index: -1;
+    background-size: auto, 200px;
 }
 </style>
 """, unsafe_allow_html=True)
