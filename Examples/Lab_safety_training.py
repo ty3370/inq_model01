@@ -108,7 +108,7 @@ def page_intro():
 
 def page_investigation():
 
-    st.title("🔎 실험실 폭발 사고 조사")
+    st.title("🔎 사고 조사")
 
     if st.button("◀ 이전 화면으로 돌아가기"):
         st.session_state["page"] = 1
