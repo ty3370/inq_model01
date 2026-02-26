@@ -44,41 +44,27 @@ if "messages" not in st.session_state:
 
 st.subheader("💬 대화 로그")
 
+chat_container = st.container(height=350)
+
 st.markdown("""
 <style>
 
-/* 채팅 컨테이너에만 배경 적용 */
-div[data-testid="stVerticalBlock"] > div:has(div[data-testid="stChatMessage"]) {
-    position: relative;
-}
-
-div[data-testid="stVerticalBlock"] > div:has(div[data-testid="stChatMessage"])::before {
-    content: "";
-    position: absolute;
-    inset: 0;
+/* chat_container 영역만 선택 */
+div[data-testid="stVerticalBlock"] > div:nth-of-type(2) {
     background-image: url("https://i.imgur.com/8epnNuh.png");
-    background-size: 60%;
+    background-size: 55%;
     background-position: center;
     background-repeat: no-repeat;
-    opacity: 0.15;
-    z-index: 0;
+    background-attachment: local;
 }
 
-/* 채팅 메시지가 배경 위에 오도록 */
-div[data-testid="stVerticalBlock"] > div:has(div[data-testid="stChatMessage"]) * {
-    position: relative;
-    z-index: 1;
-}
-
-/* 메시지 박스 약간 더 투명 */
+/* 메시지 박스를 더 투명하게 */
 [data-testid="stChatMessage"] {
-    background-color: rgba(255,255,255,0.75);
+    background-color: rgba(255,255,255,0.7);
 }
 
 </style>
 """, unsafe_allow_html=True)
-
-chat_container = st.container(height=350)
 
 for m in st.session_state["messages"]:
     if m["role"] == "system":
