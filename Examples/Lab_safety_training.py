@@ -73,21 +73,21 @@ def page_intro():
     with col_center:
 
         st.markdown(
-            "<h1 style='text-align: center;'>🧪 보라고등학교<br>실험실 폭발 사고 조사<br></h1>",
+            "<h1 style='text-align: center;'>🧪 보라고등학교<br>실험실 폭발 사고 조사</h1>",
             unsafe_allow_html=True
         )
 
         st.markdown("""
         <div style="text-align:center;">
             <img src="https://i.imgur.com/8epnNuh.png"
-                 style="max-width:350px; width:50%; height:auto;">
+                 style="max-width:250px; width:50%; height:auto;">
         </div>
         """, unsafe_allow_html=True)
 
         st.markdown("""
         <div style='text-align: center;'>
 
-        ### <br>🔍 활동 안내
+        ### 🔍 활동 안내
 
         20xx년 x월 x일, 보라고등학교 실험실에서 폭발 사고가 발생했습니다. 빠른 대피와 교사의 적절한 조치로 인명 피해는 없었지만, 교육청에서는 사안 조사를 위해 조사관을 파견했습니다.
 
