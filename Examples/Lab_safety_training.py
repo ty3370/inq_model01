@@ -124,8 +124,7 @@ def page_investigation():
     st.markdown("""
         <style>
 
-        /* 탭 텍스트가 들어있는 p 태그 직접 지정 */
-        div[data-testid="stTabs"] p {
+        div[data-testid="stTabs"] button p {
             font-size: 18px !important;
             font-weight: 900 !important;
         }
