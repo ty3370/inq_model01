@@ -43,11 +43,27 @@ if "messages" not in st.session_state:
 
 st.subheader("💬 Chat")
 
+st.markdown(
+    """
+    <div style="
+        height: 500px;
+        overflow-y: auto;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background-color: #fafafa;
+    ">
+    """,
+    unsafe_allow_html=True
+)
+
 for message in st.session_state["messages"]:
     if message["role"] == "system":
         continue
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
+
+st.markdown("</div>", unsafe_allow_html=True)
 
 user_input = st.chat_input("메시지를 입력하세요")
 
