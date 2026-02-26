@@ -116,7 +116,7 @@ def page_investigation():
 
     st.markdown("""
         <style>
-        div[role="tab"] {
+        .stTabs [role="tab"] {
             font-size: 24px !important;
             font-weight: 700 !important;
             padding: 10px 20px !important;
