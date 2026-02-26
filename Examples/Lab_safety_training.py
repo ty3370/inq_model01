@@ -134,13 +134,6 @@ def page_investigation():
             margin-bottom: 2px !important;
         }
 
-        div[data-testid="stVerticalBlock"]:has(div[data-testid="stChatMessage"]) {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            height: 350px;
-        }
-
         </style>
     """, unsafe_allow_html=True)
 
