@@ -108,14 +108,26 @@ def page_intro():
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-        btn_col1, btn_col2, btn_col3 = st.columns([1, 2, 1])
-        with btn_col2:
-            if st.button("▶ 조사 시작하기"):
-                st.session_state["page"] = 2
-                st.rerun()
+        if st.button("▶ 조사 시작하기", use_container_width=True):
+            st.session_state["page"] = 2
+            st.rerun()
 
 def page_investigation():
+
+    st.markdown("""
+        <style>
+        button[data-baseweb="tab"] {
+            font-size: 20px !important;
+            font-weight: 600 !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
     st.title("🔎 실험실 폭발 사고 조사")
+
+    if st.button("◀ 이전 화면으로 돌아가기"):
+        st.session_state["page"] = 1
+        st.rerun()
 
     tabs = st.tabs([
         "학생 A (조장)",
