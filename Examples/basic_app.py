@@ -44,23 +44,26 @@ if "messages" not in st.session_state:
 
 st.subheader("💬 대화 로그")
 
-chat_container = st.container(height=350)
-
 st.markdown("""
 <style>
-div[style*="height: 350px"] {
-    background-image: url("https://i.imgur.com/8epnNuh.png");
-    background-size: 55%;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: local;
+.stApp {
+    position: relative;
 }
 
-[data-testid="stChatMessage"] {
-    background-color: rgba(255,255,255,0.65);
+.stApp::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: url("https://i.imgur.com/8epnNuh.png");
+    background-repeat: repeat;
+    background-size: 200px;
+    opacity: 0.15;
+    z-index: -1;
 }
 </style>
 """, unsafe_allow_html=True)
+
+chat_container = st.container(height=350)
 
 for m in st.session_state["messages"]:
     if m["role"] == "system":
