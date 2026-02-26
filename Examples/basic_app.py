@@ -48,7 +48,7 @@ chat_container = st.container(height=350)
 
 st.markdown("""
 <style>
-div[data-testid="stVerticalBlock"] div[style*="overflow: auto"] {
+div[style*="height: 350px"] {
     background-image: url("https://i.imgur.com/8epnNuh.png");
     background-size: 55%;
     background-position: center;
@@ -57,7 +57,7 @@ div[data-testid="stVerticalBlock"] div[style*="overflow: auto"] {
 }
 
 [data-testid="stChatMessage"] {
-    background-color: rgba(255,255,255,0.7);
+    background-color: rgba(255,255,255,0.65);
 }
 </style>
 """, unsafe_allow_html=True)
