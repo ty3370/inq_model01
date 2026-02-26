@@ -54,8 +54,8 @@ st.markdown("""
     background-size: auto, 200px;
 }
 
-div[style*="height: 350px"] {
-    background-color: white;
+div[data-testid="stVerticalBlock"] div[style*="overflow"] {
+    background-color: white !important;
 }
 </style>
 """, unsafe_allow_html=True)
