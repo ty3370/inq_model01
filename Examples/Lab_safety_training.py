@@ -117,11 +117,10 @@ def page_investigation():
     st.markdown("""
         <style>
 
-        /* 탭 전체 영역 */
-        div[data-testid="stTabs"] button {
+        /* st.tabs 영역 안에 있는 버튼만 */
+        div[data-testid="stTabs"] button[role="tab"] {
             font-size: 26px !important;
             font-weight: 800 !important;
-            padding: 12px 24px !important;
         }
 
         </style>
