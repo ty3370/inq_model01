@@ -129,6 +129,10 @@ def page_investigation():
             font-weight: 900 !important;
         }
 
+        div[data-testid="stChatMessage"] p {
+            font-size: 12px !important;
+        }
+
         </style>
     """, unsafe_allow_html=True)
 
