@@ -46,13 +46,16 @@ st.subheader("💬 대화 로그")
 
 st.markdown("""
 <style>
-div[data-testid="stVerticalBlock"] > div:nth-child(3) {
+[data-testid="stVerticalBlock"] {
     background-image: url("https://i.imgur.com/L8T0tdU.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: local;
-    opacity: 0.95;
+}
+
+[data-testid="stChatMessage"] {
+    background-color: rgba(255,255,255,0.85);
 }
 </style>
 """, unsafe_allow_html=True)
