@@ -41,21 +41,16 @@ st.title("보라고등학교 수업용 언어 모델")
 if "messages" not in st.session_state:
     st.session_state["messages"] = [{"role": "system", "content": initial_prompt}]
 
-# 입력 필드와 전송 버튼
-with st.form(key='chat_form', clear_on_submit=True):
-    user_input = st.text_area("You: ", key="user_input")
-    submit_button = st.form_submit_button(label='전송')
+st.subheader("💬 Chat")
 
-    if submit_button and user_input:
-        # 사용자 입력 저장 및 챗봇 응답 생성
-        response = get_chatgpt_response(user_input)
-        st.write(f"**보라봇:** {response}")
+for message in st.session_state["messages"]:
+    if message["role"] == "system":
+        continue
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-# 대화 기록 출력
-if "messages" in st.session_state:
-    st.subheader("[누적 대화 목록]")  # 제목 추가
-    for message in st.session_state["messages"]:
-        if message["role"] == "user":
-            st.write(f"**You:** {message['content']}")
-        elif message["role"] == "assistant":
-            st.write(f"**보라봇:** {message['content']}")
+user_input = st.chat_input("메시지를 입력하세요")
+
+if user_input:
+    get_chatgpt_response(user_input)
+    st.rerun()
