@@ -43,44 +43,6 @@ def get_chatgpt_response(prompt):
 # Streamlit 애플리케이션
 st.title("보라고등학교 수업용 언어 모델")
 
-모바일에서 컬럼이 세로로 쌓여 줄바꿈이 일어날 때도 버튼이 왼쪽에 붙지 않도록, 버튼의 가장 바깥쪽 컨테이너부터 버튼 자체까지 float: right와 justify-content: flex-end를 중첩 적용하여 기술적으로 완전히 오른쪽 끝에 고정되도록 수정했습니다.
-
-Python
-import streamlit as st
-from openai import OpenAI
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
-MODEL = 'gpt-4o'
-
-client = OpenAI(api_key=OPENAI_API_KEY)
-
-st.set_page_config(
-    page_title="보라고등학교 수업용 언어 모델",
-    page_icon="https://i.imgur.com/BW1HzjZ.png"
-)
-
-initial_prompt = (
-    "당신은 보라고등학교 학생들을 돕기 위한 수업용 언어 모델입니다."
-    "한국어로 대화하세요."
-    "존대말로 대화하세요."
-)
-
-def get_chatgpt_response(prompt):
-    st.session_state["messages"].append({"role": "user", "content": prompt})
-    response = client.chat.completions.create(
-        model=MODEL,
-        messages=st.session_state["messages"],
-    )
-    answer = response.choices[0].message.content
-    st.session_state["messages"].append({"role": "assistant", "content": answer})
-    return answer
-
-st.title("보라고등학교 수업용 언어 모델")
-
 st.markdown("""
     <style>
     div[data-testid="stBottom"] {
