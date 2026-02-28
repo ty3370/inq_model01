@@ -51,30 +51,33 @@ st.markdown("""
         padding: 0px !important;
     }
     div[data-testid="stForm"] {
-        padding: 1rem !important;
-        border-radius: 0.5rem !important;
+        padding: 10px !important;
+        border: 1px solid #ddd !important;
+        border-radius: 10px !important;
     }
-    div[data-testid="stForm"] > div:first-child {
+    [data-testid="stHorizontalBlock"] {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
         align-items: center !important;
-        gap: 8px !important;
+        gap: 10px !important;
     }
-    div[data-testid="column"] {
+    [data-testid="column"] {
         width: auto !important;
         min-width: 0 !important;
-        padding: 0px !important;
+        flex-basis: auto !important;
     }
-    div[data-testid="column"]:nth-of-type(1) {
-        flex: 1 1 auto !important;
+    [data-testid="column"]:nth-of-type(1) {
+        flex: 8 1 0% !important;
     }
-    div[data-testid="column"]:nth-of-type(2) {
-        flex: 0 0 auto !important;
+    [data-testid="column"]:nth-of-type(2) {
+        flex: 2 1 0% !important;
+        min-width: fit-content !important;
     }
     div[data-testid="stForm"] button {
         width: 100% !important;
-        margin: 0px !important;
+        white-space: nowrap !important;
+        padding: 0px 10px !important;
     }
     .main .block-container {
         padding-bottom: 2rem !important;
@@ -97,7 +100,7 @@ with chat_container:
             st.markdown(m["content"])
 
 with st.form("chat_form", clear_on_submit=True):
-    col1, col2 = st.columns([0.8, 0.2])
+    col1, col2 = st.columns([8, 2])
     with col1:
         user_input = st.text_input("메시지", label_visibility="collapsed", placeholder="메시지를 입력하세요")
     with col2:
