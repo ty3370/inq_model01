@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -182,6 +183,16 @@ def page_intro():
             st.rerun()
 
 def page_investigation():
+
+components.html(
+        """
+        <script>
+            window.parent.window.scrollTo(0,0);
+        </script>
+        """,
+        height=0,
+    )
+
     st.title("📝 조사 기록")
 
     if st.button("◀ 이전 화면으로 돌아가기"):
