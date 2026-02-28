@@ -184,7 +184,7 @@ def page_intro():
 
 def page_investigation():
 
-components.html(
+    components.html(
         """
         <script>
             window.parent.window.scrollTo(0,0);
