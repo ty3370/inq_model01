@@ -223,32 +223,16 @@ def page_investigation():
                     {"role": "system", "content": PROMPT_MAP[agent_name]}
                 ]
 
-            chat_container = st.container(height=350)
-
             for m in st.session_state[session_key]:
                 if m["role"] == "system":
                     continue
 
                 if m["role"] == "assistant":
-                    speaker = agent_name
+                    with st.chat_message("assistant"):
+                        st.write(m["content"])
                 else:
-                    speaker = "조사관"
-
-                with chat_container:
-                    st.markdown(f"**{speaker}:** {m['content']}")
-
-            st.markdown(
-                """
-                <script>
-                const scrollable = window.parent.document.querySelectorAll('div[data-testid="stVerticalBlock"]');
-                if (scrollable.length > 0) {
-                    const target = scrollable[scrollable.length - 1];
-                    target.scrollTop = target.scrollHeight;
-                }
-                </script>
-                """,
-                unsafe_allow_html=True,
-            )
+                    with st.chat_message("user"):
+                        st.write(m["content"])
 
             user_input = st.chat_input(
                 f"{agent_name} 조사하기",
