@@ -229,29 +229,13 @@ def page_investigation():
                 if m["role"] == "system":
                     continue
 
-                if m["role"] == "assistant":
-                    speaker = agent_name
-                else:
-                    speaker = "조사관"
+                role = "assistant" if m["role"] == "assistant" else "user"
 
-                with chat_container:
-                    st.markdown(f"**{speaker}:** {m['content']}")
-
-            with chat_container:
-                st.empty()
-
-            st.markdown(
-                """
-                <script>
-                const scrollable = window.parent.document.querySelectorAll('div[data-testid="stVerticalBlock"]');
-                if (scrollable.length > 0) {
-                    const target = scrollable[scrollable.length - 1];
-                    target.scrollTop = target.scrollHeight;
-                }
-                </script>
-                """,
-                unsafe_allow_html=True,
-            )
+                with chat_container.chat_message(role):
+                    if m["role"] == "assistant":
+                        st.markdown(f"**{agent_name}:** {m['content']}")
+                    else:
+                        st.markdown(f"**조사관:** {m['content']}")
 
             user_input = st.chat_input(
                 f"{agent_name} 조사하기",
