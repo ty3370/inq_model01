@@ -74,17 +74,13 @@ with chat_container:
         with st.chat_message(m["role"]):
             st.markdown(m["content"])
 
-# 2. 입력창을 컨테이너 바로 아래에 배치 (Form 사용)
-# clear_on_submit=True를 넣어야 입력 후 글자가 자동으로 지워져.
 with st.form("chat_form", clear_on_submit=True):
-    # col1, col2로 나눠서 입력창과 전송 버튼을 한 줄에 배치
     col1, col2 = st.columns([8, 1])
     with col1:
         user_input = st.text_input("메시지를 입력하세요", label_visibility="collapsed", placeholder="메시지를 입력하세요")
     with col2:
         submit_button = st.form_submit_button("전송")
 
-    # 엔터를 치거나 전송 버튼을 눌렀을 때 실행
     if submit_button and user_input:
         get_chatgpt_response(user_input)
         st.rerun()
