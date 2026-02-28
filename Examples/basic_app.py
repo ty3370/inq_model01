@@ -75,19 +75,41 @@ with chat_container:
             st.markdown(m["content"])
 
 with st.form("chat_form", clear_on_submit=True):
-    col1, col2 = st.columns([8, 1])
-    with col1:
-        user_input = st.text_input("메시지를 입력하세요", label_visibility="collapsed", placeholder="메시지를 입력하세요")
 
-    with col2:
-        st.markdown(
-            """
-            <div style="text-align: right;">
-            """,
-            unsafe_allow_html=True
-        )
-        submit_button = st.form_submit_button("전송")
-        st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("""
+    <style>
+    .chat-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+    .chat-input {
+        flex: 1;
+    }
+    .chat-button {
+        width: 80px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown('<div class="chat-row">', unsafe_allow_html=True)
+
+    st.markdown('<div class="chat-input">', unsafe_allow_html=True)
+    user_input = st.text_input(
+        "메시지를 입력하세요",
+        label_visibility="collapsed",
+        placeholder="메시지를 입력하세요"
+    )
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown('<div class="chat-button">', unsafe_allow_html=True)
+    submit_button = st.form_submit_button(
+        "전송",
+        use_container_width=True
+    )
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown('</div>', unsafe_allow_html=True)
 
     if submit_button and user_input:
         get_chatgpt_response(user_input)
