@@ -50,6 +50,20 @@ st.markdown("""
         width: 100% !important;
         padding: 0px !important;
     }
+    [data-testid="stHorizontalBlock"] {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+    }
+    [data-testid="column"] {
+        width: auto !important;
+        flex: 1 1 auto !important;
+    }
+    [data-testid="column"]:nth-child(2) {
+        flex: 0 1 auto !important;
+        min-width: fit-content !important;
+    }
     div[data-testid="stChatInput"] {
         padding: 10px 0px !important;
     }
@@ -59,7 +73,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 대화 기록 초기화
 if "messages" not in st.session_state:
     st.session_state["messages"] = [{"role": "system", "content": initial_prompt}]
 
@@ -75,41 +88,11 @@ with chat_container:
             st.markdown(m["content"])
 
 with st.form("chat_form", clear_on_submit=True):
-
-    st.markdown("""
-    <style>
-    .chat-row {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-    }
-    .chat-input {
-        flex: 1;
-    }
-    .chat-button {
-        width: 80px;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-    st.markdown('<div class="chat-row">', unsafe_allow_html=True)
-
-    st.markdown('<div class="chat-input">', unsafe_allow_html=True)
-    user_input = st.text_input(
-        "메시지를 입력하세요",
-        label_visibility="collapsed",
-        placeholder="메시지를 입력하세요"
-    )
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    st.markdown('<div class="chat-button">', unsafe_allow_html=True)
-    submit_button = st.form_submit_button(
-        "전송",
-        use_container_width=True
-    )
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    st.markdown('</div>', unsafe_allow_html=True)
+    col1, col2 = st.columns([6, 1])
+    with col1:
+        user_input = st.text_input("메시지를 입력하세요", label_visibility="collapsed", placeholder="메시지를 입력하세요")
+    with col2:
+        submit_button = st.form_submit_button("전송")
 
     if submit_button and user_input:
         get_chatgpt_response(user_input)
