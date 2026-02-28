@@ -213,7 +213,15 @@ def page_investigation():
                         continue
                     
                     role_display = agent_name if m["role"] == "assistant" else "조사관"
-                    avatar = "🧪" if m["role"] == "assistant" else "🕵️"
+
+                    avatar_map = {
+                        "학생 A (조장)": "🧐",
+                        "학생 B": "😏",
+                        "학생 C": "😐",
+                        "사건 현장": "🏫"
+                    }
+
+                    avatar = avatar_map[agent_name] if m["role"] == "assistant" else "🕵️"
                     
                     with st.chat_message(m["role"], avatar=avatar):
                         st.markdown(f"**{role_display}**")
