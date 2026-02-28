@@ -148,7 +148,7 @@ def page_intro():
     with col_center:
 
         st.markdown(
-            "<h2 style='text-align: center;'>🧪 보라고등학교<br>실험실 폭발 사고 조사</h2>",
+            "<h2 style='text-align: center;'>🧪 보라고등학교<br>실험실 폭발 사고 조사<br></h2>",
             unsafe_allow_html=True
         )
 
