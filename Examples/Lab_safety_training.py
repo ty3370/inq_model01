@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
-MODEL = "gpt-5-nano"
+MODEL = "gpt-4o"
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
