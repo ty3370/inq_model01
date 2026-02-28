@@ -232,7 +232,7 @@ def page_investigation():
                         st.write(m["content"])
 
             user_input = st.chat_input(
-                f"{agent_name}에게 질문하기",
+                f"{agent_name} 조사하기",
                 key=f"input_{agent_name}"
             )
 
