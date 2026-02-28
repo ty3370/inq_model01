@@ -180,18 +180,31 @@ def page_intro():
 
         if st.button("▶ 조사 시작하기", use_container_width=True):
             st.session_state["page"] = 2
+            st.session_state["scroll_to_top"] = True
             st.rerun()
 
 def page_investigation():
 
-    components.html(
-        """
-        <script>
-            window.parent.window.scrollTo(0,0);
-        </script>
-        """,
-        height=0,
-    )
+    if st.session_state.get("scroll_to_top"):
+        components.html(
+            """
+            <script>
+                var scrollTargets = [
+                    window.parent.document.querySelector('.main'),
+                    window.parent.document.querySelector('.stAppViewMain'),
+                    window.parent
+                ];
+                
+                scrollTargets.forEach(function(target) {
+                    if (target && target.scrollTo) {
+                        target.scrollTo(0, 0);
+                    }
+                });
+            </script>
+            """,
+            height=0,
+        )
+        st.session_state["scroll_to_top"] = False
 
     st.title("📝 조사 기록")
 
