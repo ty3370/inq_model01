@@ -50,35 +50,16 @@ st.markdown("""
         width: 100% !important;
         padding: 0px !important;
     }
+    div[data-testid="stChatInput"] {
+        padding: 10px 0px !important;
+    }
     .main .block-container {
         padding-bottom: 2rem !important;
-    }
-    [data-testid="stForm"] {
-        border: none !important;
-        padding: 0px !important;
-    }
-    [data-testid="column"]:nth-of-type(2) {
-        display: flex !important;
-        justify-content: flex-end !important;
-        text-align: right !important;
-    }
-    div.stButton {
-        display: flex !important;
-        justify-content: flex-end !important;
-        width: 100% !important;
-    }
-    div.stButton > button {
-        float: right !important;
-        margin-left: auto !important;
-        margin-right: 0px !important;
-        width: auto !important;
-    }
-    div[data-testid="stTextInput"] {
-        width: 100% !important;
     }
     </style>
 """, unsafe_allow_html=True)
 
+# 대화 기록 초기화
 if "messages" not in st.session_state:
     st.session_state["messages"] = [{"role": "system", "content": initial_prompt}]
 
