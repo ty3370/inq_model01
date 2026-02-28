@@ -50,9 +50,6 @@ st.markdown("""
         width: 100% !important;
         padding: 0px !important;
     }
-    div[data-testid="stChatInput"] {
-        padding: 10px 0px !important;
-    }
     .main .block-container {
         padding-bottom: 2rem !important;
     }
@@ -60,13 +57,22 @@ st.markdown("""
         border: none !important;
         padding: 0px !important;
     }
-    div.stButton {
+    [data-testid="column"] {
         display: flex !important;
         justify-content: flex-end !important;
     }
+    div.stButton {
+        display: flex !important;
+        justify-content: flex-end !important;
+        width: 100% !important;
+    }
     div.stButton > button {
+        margin-left: auto !important;
         width: auto !important;
-        min-width: 80px;
+        display: block !important;
+    }
+    div[data-testid="stTextInput"] {
+        width: 100% !important;
     }
     </style>
 """, unsafe_allow_html=True)
