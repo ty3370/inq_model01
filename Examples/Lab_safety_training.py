@@ -223,6 +223,8 @@ def page_investigation():
                     {"role": "system", "content": PROMPT_MAP[agent_name]}
                 ]
 
+            chat_container = st.container(height=350)
+
             for m in st.session_state[session_key]:
                 if m["role"] == "system":
                     continue
