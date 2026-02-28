@@ -45,52 +45,23 @@ st.title("보라고등학교 수업용 언어 모델")
 
 st.markdown("""
     <style>
+    [data-testid="stForm"] {
+        border: none !important;
+        padding: 0px !important;
+    }
     div[data-testid="stBottom"] {
         position: static !important;
         width: 100% !important;
         padding: 0px !important;
     }
-    div[data-testid="stForm"] {
-        padding: 10px !important;
-        border: 1px solid #e0e0e0 !important;
-        border-radius: 10px !important;
-        box-sizing: border-box !important;
-    }
-    div[data-testid="stForm"] [data-testid="stHorizontalBlock"] {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
-        align-items: center !important;
-        width: 100% !important;
-        gap: 8px !important;
-    }
-    div[data-testid="stForm"] [data-testid="column"] {
-        width: auto !important;
-        min-width: 0 !important;
-        flex-basis: auto !important;
-        padding: 0px !important;
-    }
-    div[data-testid="stForm"] [data-testid="column"]:nth-of-type(1) {
-        flex: 1 1 0% !important;
-    }
-    div[data-testid="stForm"] [data-testid="column"]:nth-of-type(2) {
-        flex: 0 0 auto !important;
-    }
-    .stTextInput {
-        width: 100% !important;
-    }
-    .stTextInput > div, .stTextInput > div > div, .stTextInput > div > div > input {
-        width: 100% !important;
-        min-width: 0 !important;
-    }
-    div[data-testid="stForm"] button {
-        width: auto !important;
-        white-space: nowrap !important;
-        margin: 0px !important;
-        padding: 5px 15px !important;
+    div[data-testid="stChatInput"] {
+        padding: 10px 0px !important;
     }
     .main .block-container {
         padding-bottom: 2rem !important;
+    }
+    div.stButton > button {
+        width: 100%;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -110,10 +81,15 @@ with chat_container:
             st.markdown(m["content"])
 
 with st.form("chat_form", clear_on_submit=True):
-    col1, col2 = st.columns([0.8, 0.2])
-    with col1:
-        user_input = st.text_input("메시지", label_visibility="collapsed", placeholder="메시지를 입력하세요")
-    with col2:
+    col_spacer, col_input, col_btn = st.columns([4, 5, 1])
+    
+    with col_spacer:
+        st.empty()
+        
+    with col_input:
+        user_input = st.text_input("메시지를 입력하세요", label_visibility="collapsed", placeholder="메시지를 입력하세요")
+        
+    with col_btn:
         submit_button = st.form_submit_button("전송")
 
     if submit_button and user_input:
