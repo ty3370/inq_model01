@@ -9,7 +9,7 @@ load_dotenv()
 
 # OpenAI API 키 및 모델 설정
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
-MODEL = 'gpt-5-mini'
+MODEL = 'gpt-4o'
 
 # OpenAI API 클라이언트 초기화
 client = OpenAI(api_key=OPENAI_API_KEY)
