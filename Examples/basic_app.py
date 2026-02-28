@@ -63,6 +63,29 @@ st.markdown("""
 if "messages" not in st.session_state:
     st.session_state["messages"] = [{"role": "system", "content": initial_prompt}]
 
+st.markdown("""
+    <style>
+    /* 하단 고정 영역을 해제하고 일반 흐름으로 변경 */
+    div[data-testid="stBottom"] {
+        position: static !important;
+        width: 100% !important;
+        padding: 0px !important;
+    }
+    
+    /* 입력창 주변의 불필요한 여백 제거 */
+    div[data-testid="stChatInput"] {
+        padding: 10px 0px !important;
+    }
+
+    /* 전체 화면 중앙 정렬 및 최대 너비 제한 (선택 사항) */
+    .main .block-container {
+        max-width: 800px;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 st.subheader("💬 대화 로그")
 
 chat_container = st.container(height=350)
