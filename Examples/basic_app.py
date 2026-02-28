@@ -74,13 +74,6 @@ with chat_container:
         with st.chat_message(m["role"]):
             st.markdown(m["content"])
 
-with st.form("chat_form", clear_on_submit=True):
-    col1, col2 = st.columns([8, 1])
-    with col1:
-        user_input = st.text_input("메시지를 입력하세요", label_visibility="collapsed", placeholder="메시지를 입력하세요")
-    with col2:
-        submit_button = st.form_submit_button("전송")
-
-    if submit_button and user_input:
-        get_chatgpt_response(user_input)
-        st.rerun()
+if user_input := st.chat_input("메시지를 입력하세요"):
+    get_chatgpt_response(user_input)
+    st.rerun()
