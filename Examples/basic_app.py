@@ -45,10 +45,6 @@ st.title("보라고등학교 수업용 언어 모델")
 
 st.markdown("""
     <style>
-    [data-testid="stForm"] {
-        border: none !important;
-        padding: 0px !important;
-    }
     div[data-testid="stBottom"] {
         position: static !important;
         width: 100% !important;
@@ -60,8 +56,17 @@ st.markdown("""
     .main .block-container {
         padding-bottom: 2rem !important;
     }
-    div.stButton > button {
-        width: 100%;
+    [data-testid="stForm"] {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-end !important;
+        justify-content: flex-end !important;
+        border: none !important;
+        padding: 0px !important;
+    }
+    [data-testid="stForm"] > div {
+        width: 100% !important;
+        justify-content: flex-end !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -81,15 +86,10 @@ with chat_container:
             st.markdown(m["content"])
 
 with st.form("chat_form", clear_on_submit=True):
-    col_spacer, col_input, col_btn = st.columns([4, 5, 1])
-    
-    with col_spacer:
-        st.empty()
-        
-    with col_input:
+    col1, col2 = st.columns([8, 1])
+    with col1:
         user_input = st.text_input("메시지를 입력하세요", label_visibility="collapsed", placeholder="메시지를 입력하세요")
-        
-    with col_btn:
+    with col2:
         submit_button = st.form_submit_button("전송")
 
     if submit_button and user_input:
