@@ -175,46 +175,25 @@ def page_intro():
             st.rerun()
 
 def page_investigation():
-
     st.title("📝 조사 기록")
 
     if st.button("◀ 이전 화면으로 돌아가기"):
         st.session_state["page"] = 1
         st.rerun()
 
-    tabs = st.tabs([
-        "학생 A (조장)",
-        "학생 B",
-        "학생 C",
-        "사건 현장"
-    ])
+    tabs = st.tabs(["학생 A (조장)", "학생 B", "학생 C", "사건 현장"])
 
     st.markdown("""
         <style>
-
         div[data-testid="stTabs"] button p {
             font-size: 18px !important;
             font-weight: 900 !important;
         }
-
-        div[data-testid="stChatMessage"] p {
-            font-size: 14px !important;
-            margin-bottom: 2px !important;
-        }
-
-        div[data-testid="stVerticalBlock"]:has(div[data-testid="stChatMessage"]) {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            height: 350px;
-        }
-
         </style>
     """, unsafe_allow_html=True)
 
     for i, agent_name in enumerate(PROMPT_MAP.keys()):
         with tabs[i]:
-
             session_key = f"messages_{agent_name}"
 
             if session_key not in st.session_state:
@@ -223,38 +202,22 @@ def page_investigation():
                     {"role": "system", "content": PROMPT_MAP[agent_name]}
                 ]
 
-            chat_container = st.container(height=350)
-
-            for m in st.session_state[session_key]:
-                if m["role"] == "system":
-                    continue
-
-                if m["role"] == "assistant":
-                    speaker = agent_name
-                else:
-                    speaker = "조사관"
-
-                with chat_container:
-                    st.markdown(f"**{speaker}:** {m['content']}")
+            chat_container = st.container(height=450) 
 
             with chat_container:
-                st.empty()
-
-            st.markdown(
-                """
-                <script>
-                const scrollable = window.parent.document.querySelectorAll('div[data-testid="stVerticalBlock"]');
-                if (scrollable.length > 0) {
-                    const target = scrollable[scrollable.length - 1];
-                    target.scrollTop = target.scrollHeight;
-                }
-                </script>
-                """,
-                unsafe_allow_html=True,
-            )
+                for m in st.session_state[session_key]:
+                    if m["role"] == "system":
+                        continue
+                    
+                    role_display = agent_name if m["role"] == "assistant" else "조사관"
+                    avatar = "🧪" if m["role"] == "assistant" else "🕵️"
+                    
+                    with st.chat_message(m["role"], avatar=avatar):
+                        st.markdown(f"**{role_display}**")
+                        st.write(m["content"])
 
             user_input = st.chat_input(
-                f"{agent_name} 조사하기",
+                f"{agent_name}에게 질문하기",
                 key=f"input_{agent_name}"
             )
 
