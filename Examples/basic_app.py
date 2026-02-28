@@ -45,16 +45,17 @@ st.title("보라고등학교 수업용 언어 모델")
 
 st.markdown("""
     <style>
+    [data-testid="stVerticalBlock"] > div:has(div[data-testid="stChatMessage"]) {
+        min-height: 50vh; 
+        max-height: 70vh; 
+        overflow-y: auto; 
+        padding: 15px;
+        border-radius: 10px;
+        background-color: rgba(240, 242, 246, 0.5);
+    }
+    
     div[data-testid="stBottom"] {
-        position: static !important;
-        width: 100% !important;
-        padding: 0px !important;
-    }
-    div[data-testid="stChatInput"] {
-        padding: 10px 0px !important;
-    }
-    .main .block-container {
-        padding-bottom: 2rem !important;
+        padding-bottom: 20px !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -65,7 +66,7 @@ if "messages" not in st.session_state:
 
 st.subheader("💬 대화 로그")
 
-chat_container = st.container(height=350)
+chat_container = st.container()
 
 with chat_container:
     for m in st.session_state["messages"]:
