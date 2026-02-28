@@ -45,15 +45,16 @@ st.title("보라고등학교 수업용 언어 모델")
 
 st.markdown("""
     <style>
-    .block-container {
-        padding-top: 2rem;
-        padding-bottom: 0rem;
+    div[data-testid="stBottom"] {
+        position: static !important;
+        width: 100% !important;
+        padding: 0px !important;
     }
-    div[data-testid="stVerticalBlock"] {
-        gap: 0.5rem;
+    div[data-testid="stChatInput"] {
+        padding: 10px 0px !important;
     }
-    div[data-testid="stVerticalBlockBorderWrapper"] {
-        margin-bottom: -1rem;
+    .main .block-container {
+        padding-bottom: 2rem !important;
     }
     </style>
 """, unsafe_allow_html=True)
