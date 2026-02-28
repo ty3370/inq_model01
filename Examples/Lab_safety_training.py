@@ -218,7 +218,7 @@ def page_investigation():
                         "학생 A (조장)": "🧐",
                         "학생 B": "😏",
                         "학생 C": "😐",
-                        "사건 현장": "🏫"
+                        "사건 현장": "🔍"
                     }
 
                     avatar = avatar_map[agent_name] if m["role"] == "assistant" else "🕵️"
