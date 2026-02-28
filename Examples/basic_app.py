@@ -54,37 +54,37 @@ st.markdown("""
         padding: 10px !important;
         border: 1px solid #e0e0e0 !important;
         border-radius: 10px !important;
-        overflow: hidden !important;
         box-sizing: border-box !important;
     }
-    div[data-testid="stForm"] [data-testid="stHorizontalBlock"] {
+    div[data-testid="stForm"] > div:first-child {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
         align-items: center !important;
         width: 100% !important;
-        gap: 5px !important;
+        gap: 8px !important;
     }
-    div[data-testid="stForm"] [data-testid="column"] {
+    [data-testid="column"] {
         min-width: 0 !important;
         flex-shrink: 1 !important;
-        width: auto !important;
+        flex-grow: 1 !important;
         padding: 0px !important;
     }
-    div[data-testid="stForm"] [data-testid="column"]:nth-of-type(1) {
-        flex: 1 1 auto !important;
+    [data-testid="column"]:nth-of-type(2) {
+        flex-grow: 0 !important;
+        flex-shrink: 0 !important;
+        width: fit-content !important;
     }
-    div[data-testid="stForm"] [data-testid="column"]:nth-of-type(2) {
-        flex: 0 0 auto !important;
-    }
-    div[data-testid="stForm"] .stTextInput {
+    .stTextInput, .stTextInput > div, .stTextInput > div > div, .stTextInput > div > div > input {
         width: 100% !important;
+        min-width: 0 !important;
     }
     div[data-testid="stForm"] button {
         width: auto !important;
         white-space: nowrap !important;
-        padding: 5px 12px !important;
+        padding: 5px 15px !important;
         margin: 0px !important;
+        display: block !important;
     }
     .main .block-container {
         padding-bottom: 2rem !important;
