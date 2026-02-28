@@ -57,16 +57,16 @@ st.markdown("""
         padding-bottom: 2rem !important;
     }
     [data-testid="stForm"] {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: flex-end !important;
-        justify-content: flex-end !important;
         border: none !important;
         padding: 0px !important;
     }
-    [data-testid="stForm"] > div {
-        width: 100% !important;
+    div.stButton {
+        display: flex !important;
         justify-content: flex-end !important;
+    }
+    div.stButton > button {
+        width: auto !important;
+        min-width: 80px;
     }
     </style>
 """, unsafe_allow_html=True)
