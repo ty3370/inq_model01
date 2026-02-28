@@ -43,6 +43,21 @@ def get_chatgpt_response(prompt):
 # Streamlit 애플리케이션
 st.title("보라고등학교 수업용 언어 모델")
 
+st.markdown("""
+    <style>
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 0rem;
+    }
+    div[data-testid="stVerticalBlock"] {
+        gap: 0.5rem;
+    }
+    div[data-testid="stVerticalBlockBorderWrapper"] {
+        margin-bottom: -1rem;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 # 대화 기록 초기화
 if "messages" not in st.session_state:
     st.session_state["messages"] = [{"role": "system", "content": initial_prompt}]
