@@ -43,6 +43,45 @@ def get_chatgpt_response(prompt):
 # Streamlit 애플리케이션
 st.title("보라고등학교 수업용 언어 모델")
 
+주석을 완전히 제거하고, 모바일에서도 박스 테두리를 유지하면서 전송 버튼이 밖으로 나가지 않도록 레이아웃을 완전히 고정했습니다.
+
+Python
+import streamlit as st
+from openai import OpenAI
+import os
+from dotenv import load_dotenv
+import html
+
+load_dotenv()
+
+OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
+MODEL = 'gpt-4o'
+
+client = OpenAI(api_key=OPENAI_API_KEY)
+
+st.set_page_config(
+    page_title="보라고등학교 수업용 언어 모델",
+    page_icon="https://i.imgur.com/BW1HzjZ.png"
+)
+
+initial_prompt = (
+    "당신은 보라고등학교 학생들을 돕기 위한 수업용 언어 모델입니다."
+    "한국어로 대화하세요."
+    "존대말로 대화하세요."
+)
+
+def get_chatgpt_response(prompt):
+    st.session_state["messages"].append({"role": "user", "content": prompt})
+    response = client.chat.completions.create(
+        model=MODEL,
+        messages=st.session_state["messages"],
+    )
+    answer = response.choices[0].message.content
+    st.session_state["messages"].append({"role": "assistant", "content": answer})
+    return answer
+
+st.title("보라고등학교 수업용 언어 모델")
+
 st.markdown("""
     <style>
     div[data-testid="stBottom"] {
@@ -52,32 +91,39 @@ st.markdown("""
     }
     div[data-testid="stForm"] {
         padding: 10px !important;
-        border: 1px solid #ddd !important;
+        border: 1px solid #e0e0e0 !important;
         border-radius: 10px !important;
+        box-sizing: border-box !important;
     }
-    [data-testid="stHorizontalBlock"] {
+    div[data-testid="stForm"] > div:first-child {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
         align-items: center !important;
-        gap: 10px !important;
+        gap: 5px !important;
+        width: 100% !important;
     }
     [data-testid="column"] {
-        width: auto !important;
         min-width: 0 !important;
-        flex-basis: auto !important;
-    }
-    [data-testid="column"]:nth-of-type(1) {
-        flex: 8 1 0% !important;
+        flex: 1 1 auto !important;
+        width: auto !important;
+        padding: 0px !important;
     }
     [data-testid="column"]:nth-of-type(2) {
-        flex: 2 1 0% !important;
-        min-width: fit-content !important;
+        flex: 0 0 auto !important;
+        width: fit-content !important;
+    }
+    .stTextInput {
+        width: 100% !important;
+    }
+    .stTextInput > div > div > input {
+        width: 100% !important;
     }
     div[data-testid="stForm"] button {
-        width: 100% !important;
+        width: auto !important;
         white-space: nowrap !important;
-        padding: 0px 10px !important;
+        padding: 0px 15px !important;
+        margin: 0px !important;
     }
     .main .block-container {
         padding-bottom: 2rem !important;
@@ -100,7 +146,7 @@ with chat_container:
             st.markdown(m["content"])
 
 with st.form("chat_form", clear_on_submit=True):
-    col1, col2 = st.columns([8, 2])
+    col1, col2 = st.columns([0.8, 0.2])
     with col1:
         user_input = st.text_input("메시지", label_visibility="collapsed", placeholder="메시지를 입력하세요")
     with col2:
