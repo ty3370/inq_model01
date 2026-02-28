@@ -43,45 +43,6 @@ def get_chatgpt_response(prompt):
 # Streamlit 애플리케이션
 st.title("보라고등학교 수업용 언어 모델")
 
-주석을 완전히 제거하고, 모바일에서도 박스 테두리를 유지하면서 전송 버튼이 밖으로 나가지 않도록 레이아웃을 완전히 고정했습니다.
-
-Python
-import streamlit as st
-from openai import OpenAI
-import os
-from dotenv import load_dotenv
-import html
-
-load_dotenv()
-
-OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
-MODEL = 'gpt-4o'
-
-client = OpenAI(api_key=OPENAI_API_KEY)
-
-st.set_page_config(
-    page_title="보라고등학교 수업용 언어 모델",
-    page_icon="https://i.imgur.com/BW1HzjZ.png"
-)
-
-initial_prompt = (
-    "당신은 보라고등학교 학생들을 돕기 위한 수업용 언어 모델입니다."
-    "한국어로 대화하세요."
-    "존대말로 대화하세요."
-)
-
-def get_chatgpt_response(prompt):
-    st.session_state["messages"].append({"role": "user", "content": prompt})
-    response = client.chat.completions.create(
-        model=MODEL,
-        messages=st.session_state["messages"],
-    )
-    answer = response.choices[0].message.content
-    st.session_state["messages"].append({"role": "assistant", "content": answer})
-    return answer
-
-st.title("보라고등학교 수업용 언어 모델")
-
 st.markdown("""
     <style>
     div[data-testid="stBottom"] {
