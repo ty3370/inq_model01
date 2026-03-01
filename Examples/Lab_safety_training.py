@@ -234,7 +234,7 @@ def page_investigation():
                     {"role": "system", "content": PROMPT_MAP[agent_name]}
                 ]
 
-            chat_container = st.container(height=450) 
+            chat_container = st.container(height=350) 
 
             with chat_container:
                 for m in st.session_state[session_key]:
