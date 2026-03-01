@@ -157,7 +157,7 @@ def page_intro():
 #        st.markdown("""
 #        <div style="text-align:center;">
 #            <img src="https://i.imgur.com/8epnNuh.png"
-#                 style="max-width:250px; width:50%; height:auto;">
+#                 style="max-width:500px; width:50%; height:auto;">
 #        </div>
 #        """, unsafe_allow_html=True)
 
