@@ -2,16 +2,22 @@ import streamlit as st
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
+import html
 
 # 환경 변수 로드
 load_dotenv()
 
 # OpenAI API 키 및 모델 설정
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
-MODEL = 'gpt-4.1'
+MODEL = 'gpt-4o'
 
 # OpenAI API 클라이언트 초기화
 client = OpenAI(api_key=OPENAI_API_KEY)
+
+st.set_page_config(
+    page_title="과학 사건 추리 활동",
+    page_icon="https://i.imgur.com/BW1HzjZ.png"
+)
 
 # 초기 프롬프트 설정
 initial_prompt = (
@@ -61,29 +67,41 @@ def get_chatgpt_response(prompt):
     return answer
 
 # Streamlit 애플리케이션
-st.title("과학 추리 도우미")
+st.title("과학 사건 추리 활동")
 st.write("당신은 탐정입니다. 인공지능 비서와 대화하며 사건을 해결해 보세요.")
 st.image("https://i.imgur.com/KRvJ4GU.png", use_container_width=True)
+
+st.markdown("""
+    <style>
+    div[data-testid="stBottom"] {
+        position: static !important;
+        width: 100% !important;
+        padding: 0px !important;
+    }
+    div[data-testid="stChatInput"] {
+        padding: 10px 0px !important;
+    }
+    .main .block-container {
+        padding-bottom: 2rem !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 # 대화 기록 초기화
 if "messages" not in st.session_state:
     st.session_state["messages"] = [{"role": "system", "content": initial_prompt}]
 
-# 입력 필드와 전송 버튼
-with st.form(key='chat_form', clear_on_submit=True):
-    user_input = st.text_area("You: ", key="user_input")
-    submit_button = st.form_submit_button(label='전송')
+st.subheader("💬 대화 로그")
 
-    if submit_button and user_input:
-        # 사용자 입력 저장 및 챗봇 응답 생성
-        response = get_chatgpt_response(user_input)
-        st.write(f"**인공지능 비서:** {response}")
+chat_container = st.container(height=350)
 
-# 대화 기록 출력
-if "messages" in st.session_state:
-    st.subheader("[누적 대화 목록]")  # 제목 추가
-    for message in st.session_state["messages"]:
-        if message["role"] == "user":
-            st.write(f"**You:** {message['content']}")
-        elif message["role"] == "assistant":
-            st.write(f"**인공지능 비서:** {message['content']}")
+with chat_container:
+    for m in st.session_state["messages"]:
+        if m["role"] == "system":
+            continue
+        with st.chat_message(m["role"]):
+            st.markdown(m["content"])
+
+if user_input := st.chat_input("메시지를 입력하세요"):
+    get_chatgpt_response(user_input)
+    st.rerun()
