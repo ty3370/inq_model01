@@ -93,7 +93,7 @@ if "messages" not in st.session_state:
 
 st.subheader("💬 대화 로그")
 
-chat_container = st.container(height=350)
+chat_container = st.container(height=250)
 
 with chat_container:
     for m in st.session_state["messages"]:
