@@ -216,7 +216,7 @@ def page_investigation():
         st.session_state["page"] = 1
         st.rerun()
 
-    tabs = st.tabs(["학생 A (조장)", "학생 B", "학생 C", "사건 현장"])
+    tabs = st.tabs(["학생 A (조장)", "학생 B", "학생 C", "사건 현장 (과학실)"])
 
     st.markdown("""
         <style>
