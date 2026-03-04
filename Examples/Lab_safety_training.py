@@ -123,7 +123,7 @@ PROMPT_MAP = {
     "학생 A (조장)": prompt_A,
     "학생 B": prompt_B,
     "학생 C": prompt_C,
-    "사건 현장": prompt_scene
+    "사건 현장 (과학실)": prompt_scene
 }
 
 def get_response(agent_key, user_input):
@@ -250,7 +250,7 @@ def page_investigation():
                         "학생 A (조장)": "🧐",
                         "학생 B": "😏",
                         "학생 C": "😐",
-                        "사건 현장": "🔍"
+                        "사건 현장 (과학실)": "🔍"
                     }
 
                     avatar = avatar_map[agent_name] if m["role"] == "assistant" else "🕵️"
