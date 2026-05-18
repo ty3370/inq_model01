@@ -64,7 +64,7 @@ with st.form(key='chat_form', clear_on_submit=True):
 
 # 대화 기록 출력
 if "messages" in st.session_state:
-    st.subheader("[누적 대화 목록]")  # 제목 추가
+    st.subheader("⚔️ 모험 기록")  # 제목 추가
     for message in st.session_state["messages"]:
         if message["role"] == "user":
             st.write(f"**You:** {message['content']}")
