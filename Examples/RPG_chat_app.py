@@ -2,19 +2,24 @@ import streamlit as st
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
+import html
 
 # 환경 변수 로드
 load_dotenv()
 
 # OpenAI API 키 및 모델 설정
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
-MODEL = 'gpt-4.1'
+MODEL = 'gpt-4o'
 
 # OpenAI API 클라이언트 초기화
 client = OpenAI(api_key=OPENAI_API_KEY)
 
+st.set_page_config(
+    page_title="보라니아 탐험대",
+    page_icon="https://i.imgur.com/BW1HzjZ.png"
+)
+
 # 초기 프롬프트 설정
-# 이 모델은 큰 틀에서의 스토리가 전혀 없는 모델이라 비교적 짧은 프롬프트로 제작이 가능함. 스토리를 넣으려면 훨씬 더 긴 프롬프트 필요.
 initial_prompt = (
     "당신은 중세 판타지 세계 '보라니아'를 배경으로 한 텍스트 기반 인터랙티브 RPG의 내레이터이자 시스템 마스터입니다. "
     "이 세계에는 다양한 종족(예: 인간, 엘프, 드워프, 오크 등)과 직업(예: 전사, 마법사, 도적, 사제 등)이 존재하며, 마법과 신화, 퀘스트가 가득합니다. "
@@ -45,25 +50,37 @@ def get_chatgpt_response(prompt):
 # Streamlit 애플리케이션
 st.title("보라니아 탐험대")
 
+st.markdown("""
+    <style>
+    div[data-testid="stBottom"] {
+        position: static !important;
+        width: 100% !important;
+        padding: 0px !important;
+    }
+    div[data-testid="stChatInput"] {
+        padding: 10px 0px !important;
+    }
+    .main .block-container {
+        padding-bottom: 2rem !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 # 대화 기록 초기화
 if "messages" not in st.session_state:
     st.session_state["messages"] = [{"role": "system", "content": initial_prompt}]
 
-# 입력 필드와 전송 버튼
-with st.form(key='chat_form', clear_on_submit=True):
-    user_input = st.text_area("You: ", key="user_input")
-    submit_button = st.form_submit_button(label='전송')
+st.subheader("⚔️ 모험 기록")
 
-    if submit_button and user_input:
-        # 사용자 입력 저장 및 챗봇 응답 생성
-        response = get_chatgpt_response(user_input)
-        st.write(f"**게임 마스터:** {response}")
+chat_container = st.container(height=350)
 
-# 대화 기록 출력
-if "messages" in st.session_state:
-    st.subheader("[누적 대화 목록]")  # 제목 추가
-    for message in st.session_state["messages"]:
-        if message["role"] == "user":
-            st.write(f"**You:** {message['content']}")
-        elif message["role"] == "assistant":
-            st.write(f"**게임 마스터:** {message['content']}")
+with chat_container:
+    for m in st.session_state["messages"]:
+        if m["role"] == "system":
+            continue
+        with st.chat_message(m["role"]):
+            st.markdown(m["content"])
+
+if user_input := st.chat_input("메시지를 입력하세요"):
+    get_chatgpt_response(user_input)
+    st.rerun()
