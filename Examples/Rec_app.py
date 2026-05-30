@@ -112,7 +112,7 @@ st.set_page_config(
 
 st.markdown(
     """
-    <h1 style="text-align: center;">생기부 작성 챗봇</h1>
+    <h1 style="text-align: center;">생기부 자동 생성기</h1>
     """, 
     unsafe_allow_html=True
 )
