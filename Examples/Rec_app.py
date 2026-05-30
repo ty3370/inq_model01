@@ -152,7 +152,7 @@ with tab1:
                 response = get_chatgpt_response(formatted_prompt, "messages_tab1")
                 st.write(f"**생기부 생성기:** {response}")
             
-    st.subheader("대화 기록 (창체)")
+    st.subheader("생성 기록 (창체)")
     for message in st.session_state["messages_tab1"]:
         if message["role"] == "user":
             st.write(f"**You:** {message['content']}")
@@ -187,7 +187,7 @@ with tab2:
                 response = get_chatgpt_response(formatted_prompt, "messages_tab2")
                 st.write(f"**생기부 생성기:** {response}")
             
-    st.subheader("대화 기록 (교과세특)")
+    st.subheader("생성 기록 (교과세특)")
     for message in st.session_state["messages_tab2"]:
         if message["role"] == "user":
             st.write(f"**You:** {message['content']}")
@@ -214,7 +214,7 @@ with tab3:
                 response = get_chatgpt_response(user_input3, "messages_tab3")
                 st.write(f"**생기부 생성기:** {response}")
             
-    st.subheader("대화 기록 (행발)")
+    st.subheader("생성 기록 (행발)")
     for message in st.session_state["messages_tab3"]:
         if message["role"] == "user":
             st.write(f"**You:** {message['content']}")
