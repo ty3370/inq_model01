@@ -93,7 +93,7 @@ def get_chatgpt_response(prompt, key):
     st.session_state[key].append({"role": "assistant", "content": answer})
     return answer
 
-# --- 세련된 UI 스타일 정의 (오류 수정 완료) ---
+# --- 세련된 UI 스타일 정의 ---
 st.set_page_config(layout="wide")
 st.markdown("""
     <style>
@@ -141,13 +141,13 @@ with tab1:
                 st.success("생기부가 성공적으로 생성되었습니다!")
             
     st.subheader("💬 대화 기록 (창체)")
-    st.markdown('<div class="chat-container">', unsafe_html=True)
+    st.markdown('<div class="chat-container">', unsafe_allow_html=True)
     for message in st.session_state["messages_tab1"]:
         if message["role"] == "user":
-            st.markdown(f'<div class="user-bubble"><b>You:</b><br>{message["content"].replace("\n", "<br>")}</div>', unsafe_html=True)
+            st.markdown(f'<div class="user-bubble"><b>You:</b><br>{message["content"].replace("\n", "<br>")}</div>', unsafe_allow_html=True)
         elif message["role"] == "assistant":
-            st.markdown(f'<div class="bot-bubble"><b>생기부봇:</b><br>{message["content"].replace("\n", "<br>")}</div>', unsafe_html=True)
-    st.markdown('</div>', unsafe_html=True)
+            st.markdown(f'<div class="bot-bubble"><b>생기부봇:</b><br>{message["content"].replace("\n", "<br>")}</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 
 # --- 탭 2: 교과세특 생기부 생성 ---
@@ -178,13 +178,13 @@ with tab2:
                 st.success("생기부가 성공적으로 생성되었습니다!")
             
     st.subheader("💬 대화 기록 (교과세특)")
-    st.markdown('<div class="chat-container">', unsafe_html=True)
+    st.markdown('<div class="chat-container">', unsafe_allow_html=True)
     for message in st.session_state["messages_tab2"]:
         if message["role"] == "user":
-            st.markdown(f'<div class="user-bubble"><b>You:</b><br>{message["content"].replace("\n", "<br>")}</div>', unsafe_html=True)
+            st.markdown(f'<div class="user-bubble"><b>You:</b><br>{message["content"].replace("\n", "<br>")}</div>', unsafe_allow_html=True)
         elif message["role"] == "assistant":
-            st.markdown(f'<div class="bot-bubble"><b>생기부봇:</b><br>{message["content"].replace("\n", "<br>")}</div>', unsafe_html=True)
-    st.markdown('</div>', unsafe_html=True)
+            st.markdown(f'<div class="bot-bubble"><b>생기부봇:</b><br>{message["content"].replace("\n", "<br>")}</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 
 # --- 탭 3: 행발 생기부 생성 ---
@@ -207,10 +207,10 @@ with tab3:
                 st.success("생기부가 성공적으로 생성되었습니다!")
             
     st.subheader("💬 대화 기록 (행발)")
-    st.markdown('<div class="chat-container">', unsafe_html=True)
+    st.markdown('<div class="chat-container">', unsafe_allow_html=True)
     for message in st.session_state["messages_tab3"]:
         if message["role"] == "user":
-            st.markdown(f'<div class="user-bubble"><b>You:</b><br>{message["content"].replace("\n", "<br>")}</div>', unsafe_html=True)
+            st.markdown(f'<div class="user-bubble"><b>You:</b><br>{message["content"].replace("\n", "<br>")}</div>', unsafe_allow_html=True)
         elif message["role"] == "assistant":
-            st.markdown(f'<div class="bot-bubble"><b>생기부봇:</b><br>{message["content"].replace("\n", "<br>")}</div>', unsafe_html=True)
+            st.markdown(f'<div class="bot-bubble"><b>생기부봇:</b><br>{message["content"].replace("\n", "<br>")}</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_html=True)
