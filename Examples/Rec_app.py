@@ -65,13 +65,11 @@ initial_prompt = (
     "적절한 표현 예시(교사가 관찰 가능): ~에 대한 활동지를 작성함. ~에 대해 느낀 점을 충실하게 작성함. ~에 대해 생각하는 시간을 가짐. ~을 활동지에 기록함. ~으로 표현함. ~하다는 포부를 밝힘. ~하는 모습을 보임. ~한 모습이 돋보임. ~에 대해 좀 더 심도 있게 탐구함. ~ 하는 능력이 뛰어남. ~하여 학생들에게 좋은 반응을 얻음."
 )
 
-# 자율활동 반복 생기부용 추가 프롬프트
-repeated_activity_prompt = (
-    "당신은 생기부 자율활동 내용을 생성하는 ai입니다. 사용자는 자율활동 내용과 날짜를 입력할 것입니다."
+# 창체 추가 프롬프트
+activity_prompt = (
+    "당신은 생기부 자율활동 내용을 생성하는 ai입니다. 사용자는 자율활동 내용과 날짜, 학생의 개별 활동 자료, 기타 요청 사항을 입력할 것입니다."
     "사용자에게는 '사이버폭력예방교육(2025.03.10.)' 같은 양식으로 자율활동 내용(날짜)를 입력하도록 안내했습니다. 만약 사용자가 자율활동 내용과 날짜를 입력하지 않았다면, 양식에 맞게 제시해달라고 안내하세요."
-    "자율활동 내용과 날짜를 바탕으로 입력 내용을 2~3줄 분량으로 생성하세요."
-    "5명에게 써줄 수 있도록 5개의 서로 다른 자율활동 내용을 생성하세요. 이때 1~5번의 번호마다 줄바꿈을 하세요. 단, 1~5번의 숫자는 쓰지 말고 내용만 쓰고 줄바꿈 하세요."
-    "무슨 글을 작성했다거나 뭔가를 설명 또는 제안했다는 내용으로 작성하세요."
+    "자율활동 내용과 날짜를 바탕으로 입력 내용을 생성하세요."
     "작성 양식: 자율 활동 내용(날짜) 세부내용. 이때 날짜는 괄호 안에 년도, 점, 월, 점, 일, 점으로 작성합니다."
     "잘못된 예시 1) 온라인 공간에서의 예절 중요성을 알게 되었다고 언급하며, 구체적인 사례를 들어 설명함."
     "올바른 예시 1) 사이버폭력예방교육(2025.03.10.)에서 온라인 공간에서의 예절 중요성을 알게 되었다고 언급하며, 구체적인 사례를 들어 설명함."
@@ -81,7 +79,13 @@ repeated_activity_prompt = (
     "올바른 예시 3) 성폭력예방교육(2025.05.09.)에서 경청의 중요성을 강조하며 친구들과의 협력을 제안함."
     "잘못된 예시 4) 1학기 학급자치회 회장 활동을 하며 다양한 행사의 기획과 실행을 통해 학생들의 참여도를 높이며 학급 단합을 이룸. 수행평가와 과제 제출 일정을 학우들에게 정확하게 공지하여 학업 활동 지원에 기여함. 동료들과의 소통을 통해 학급 운영을 원활히 하고 학우들에게 긍정적인 영향을 미침."
     "올바른 예시 4) 1학기 학급자치회 회장(2025.03.01.-2025.08.10.)으로 다양한 행사의 기획과 실행을 통해 학생들의 참여도를 높이며 학급 단합을 이룸. 수행평가와 과제 제출 일정을 학우들에게 정확하게 공지하여 학업 활동 지원에 기여함. 동료들과의 소통을 통해 학급 운영을 원활히 하고 학우들에게 긍정적인 영향을 미침."
-    "위의 예시와 같이 자율활동 내용과 날짜를 예시의 양식 그대로 써서, 같은 자율활동에 대한 5개의 생기부 내용을 생성해야 합니다."
+    "위의 예시와 같이 자율활동 내용과 날짜를 예시의 양식 그대로 써야 합니다."
+)
+
+# 교과세특 추가 프롬프트
+subject_prompt = (
+    "당신은 생기부 교과세특 내용을 생성하는 ai입니다. 사용자는 교과세특 활동 내용에 관한 간략한 설명, 학생의 개별 활동 자료, 기타 요청 사항를 입력할 것입니다."
+    "학생의 개별 활동 자료를 중심으로 교과 세특을 생성하세요."
 )
 
 # GPT 응답 함수
@@ -95,43 +99,101 @@ def get_chatgpt_response(prompt, key):
     st.session_state[key].append({"role": "assistant", "content": answer})
     return answer
 
-# Streamlit 앱
+# Streamlit 앱 UI 설정
 st.title("생기부 작성 챗봇")
-tab1, tab2 = st.tabs(["일반 생기부 생성", "자율활동 5건 일괄 생성"])
 
-# 탭 1
+# 1. 3개의 탭으로 변경
+tab1, tab2, tab3 = st.tabs(["창체 생기부 생성", "교과세특 생기부 생성", "행발 생기부 생성"])
+
+# --- 탭 1: 창체 생기부 생성 ---
 with tab1:
-    st.subheader("일반 생기부 생성")
+    st.subheader("창체 생기부 생성")
     if "messages_tab1" not in st.session_state:
-        st.session_state["messages_tab1"] = [{"role": "system", "content": initial_prompt}]
-    st.info("몇 개의 키워드나 정리되지 않은 글을 입력하면 생기부 양식으로 작성해 줍니다.")
+        # initial_prompt + activity_prompt 결합
+        st.session_state["messages_tab1"] = [{"role": "system", "content": initial_prompt + activity_prompt}]
+    
+    st.info("자율활동 내용, 개별 활동 자료, 요청 사항을 입력하여 창체 생기부를 생성합니다.")
+    
+    # 3개의 입력 칸 구성
     with st.form(key='form_tab1', clear_on_submit=True):
-        user_input1 = st.text_area("내용 입력:", key="user_input1")
-        submit_button1 = st.form_submit_button("전송")
-        if submit_button1 and user_input1:
-            response = get_chatgpt_response(user_input1, "messages_tab1")
+        act_date = st.text_input("자율활동 내용과 날짜:", placeholder="예시: 사이버폭력예방교육(2025.03.10.)", key="act_date")
+        act_student_data = st.text_area("학생의 개별 활동 자료:", placeholder="예시: 온라인 공간에서의 예절 중요성을 알게 되었다고 발표함", key="act_student_data")
+        act_etc = st.text_input("기타 요청 사항:", placeholder="예시: 의사소통 역량을 부각할 것", key="act_etc")
+        
+        submit_button1 = st.form_submit_button("생기부 생성")
+        
+        if submit_button1 and act_date and act_student_data:
+            # 지정된 포맷으로 프롬프트 구성
+            formatted_prompt = (
+                f"자율 활동 내용과 날짜: {act_date}\n"
+                f"학생의 개별 활동 자료: {act_student_data}\n"
+                f"기타 요청 사항: {act_etc}"
+            )
+            response = get_chatgpt_response(formatted_prompt, "messages_tab1")
             st.write(f"**생기부봇:** {response}")
-    st.subheader("대화 기록 (일반 생기부)")
+            
+    st.subheader("대화 기록 (창체)")
     for message in st.session_state["messages_tab1"]:
         if message["role"] == "user":
             st.write(f"**You:** {message['content']}")
         elif message["role"] == "assistant":
             st.write(f"**생기부봇:** {message['content']}")
 
-# 탭 2
+
+# --- 탭 2: 교과세특 생기부 생성 ---
 with tab2:
-    st.subheader("자율활동 5건 일괄 생성")
-    st.info("자율활동 내용과 날짜를 입력하면 5개의 생기부 내용을 생성합니다.\n\n예) 사이버폭력예방교육(2025.03.10.) ← 이런 양식으로 작성하세요.")
+    st.subheader("교과세특 생기부 생성")
     if "messages_tab2" not in st.session_state:
-        st.session_state["messages_tab2"] = [{"role": "system", "content": initial_prompt + repeated_activity_prompt}]
+        # initial_prompt + subject_prompt 결합
+        st.session_state["messages_tab2"] = [{"role": "system", "content": initial_prompt + subject_prompt}]
+        
+    st.info("교과 설명, 개별 활동 자료, 요청 사항을 입력하여 교과세특 생기부를 생성합니다.")
+    
+    # 3개의 입력 칸 구성
     with st.form(key='form_tab2', clear_on_submit=True):
-        user_input2 = st.text_area("자율활동 내용(날짜):", key="user_input2")
-        submit_button2 = st.form_submit_button("전송")
-        if submit_button2 and user_input2:
-            response = get_chatgpt_response(user_input2, "messages_tab2")
+        sub_desc = st.text_input("교과세특 활동 내용에 관한 간략한 설명:", placeholder="예시: 운동량과 충격량 전환이 적용된 사례 발표", key="sub_desc")
+        sub_student_data = st.text_area("학생의 개별 활동 자료:", placeholder="예시: 안전모의 원리를 발표함", key="sub_student_data")
+        sub_etc = st.text_input("기타 요청 사항:", placeholder="예시: 과학적 사고력과 창의성을 부각할 것", key="sub_etc")
+        
+        submit_button2 = st.form_submit_button("생기부 생성")
+        
+        if submit_button2 and sub_desc and sub_student_data:
+            # 지정된 포맷으로 프롬프트 구성
+            formatted_prompt = (
+                f"교과세특 활동 내용에 관한 간략한 설명: {sub_desc}\n"
+                f"학생의 개별 활동 자료: {sub_student_data}\n"
+                f"기타 요청 사항: {sub_etc}"
+            )
+            response = get_chatgpt_response(formatted_prompt, "messages_tab2")
             st.write(f"**생기부봇:** {response}")
-    st.subheader("대화 기록 (자율활동 5건)")
+            
+    st.subheader("대화 기록 (교과세특)")
     for message in st.session_state["messages_tab2"]:
+        if message["role"] == "user":
+            st.write(f"**You:** {message['content']}")
+        elif message["role"] == "assistant":
+            st.write(f"**생기부봇:** {message['content']}")
+
+
+# --- 탭 3: 행발 생기부 생성 ---
+with tab3:
+    st.subheader("행발 생기부 생성")
+    if "messages_tab3" not in st.session_state:
+        # 일반 생기부 시스템 프롬프트 적용
+        st.session_state["messages_tab3"] = [{"role": "system", "content": initial_prompt}]
+        
+    st.info("몇 개의 키워드나 정리되지 않은 글을 입력하면 행발 생기부 양식으로 작성해 줍니다.")
+    
+    with st.form(key='form_tab3', clear_on_submit=True):
+        user_input3 = st.text_area("내용 입력:", key="user_input3")
+        submit_button3 = st.form_submit_button("생기부 생성")
+        
+        if submit_button3 and user_input3:
+            response = get_chatgpt_response(user_input3, "messages_tab3")
+            st.write(f"**생기부봇:** {response}")
+            
+    st.subheader("대화 기록 (행발)")
+    for message in st.session_state["messages_tab3"]:
         if message["role"] == "user":
             st.write(f"**You:** {message['content']}")
         elif message["role"] == "assistant":
