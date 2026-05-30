@@ -82,12 +82,6 @@ activity_prompt = (
     "위의 예시와 같이 자율활동 내용과 날짜를 예시의 양식 그대로 지키면서 최대한 풍성하게 써야 합니다."
 )
 
-# 교과세특 추가 프롬프트
-subject_prompt = (
-    "당신은 생기부 교과세특 내용을 생성하는 ai입니다. 사용자는 교과세특 활동 내용에 관한 간략한 설명, 학생의 개별 활동 자료, 기타 요청 사항를 입력할 것입니다."
-    "학생의 개별 활동 자료를 중심으로 최대한 풍부하게 교과 세특을 생성하세요."
-)
-
 # GPT 응답 함수
 def get_chatgpt_response(prompt, key):
     st.session_state[key].append({"role": "user", "content": prompt})
@@ -99,7 +93,7 @@ def get_chatgpt_response(prompt, key):
     st.session_state[key].append({"role": "assistant", "content": answer})
     return answer
 
-# --- 세련된 UI 스타일 정의 (CSS 추가) ---
+# --- 세련된 UI 스타일 정의 (오류 수정 완료) ---
 st.set_page_config(layout="wide")
 st.markdown("""
     <style>
@@ -112,7 +106,7 @@ st.markdown("""
     .bot-bubble { background-color: #FFFFFF; color: #1E293B; padding: 0.75rem 1rem; border-radius: 12px 12px 12px 0; margin: 0.5rem auto 0.5rem 0; max-width: 80%; width: fit-content; border: 1px solid #E2E8F0; font-size: 0.95rem; line-height: 1.5; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
     .chat-container { background-color: #F1F5F9; border-radius: 12px; padding: 1.5rem; max-height: 500px; overflow-y: auto; border: 1px solid #E2E8F0; margin-top: 1rem; }
     </style>
-""", unsafe_html=class_name)
+""", unsafe_allow_html=True)
 
 # Streamlit 앱 UI 설정
 st.title("📝 생기부 작성 챗봇")
