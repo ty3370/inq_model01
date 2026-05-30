@@ -105,12 +105,24 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("생기부 자동 생성기")
 st.markdown(
     """
-    > 💫 **“많은 사람을 옳은 데로 돌아오게 한 자는 별과 같이 영원토록 빛나리라”** — 다니엘 12장 3절
-    """
+    <h1 style="text-align: center;">생기부 작성 챗봇</h1>
+    """, 
+    unsafe_allow_html=True
 )
+
+st.markdown(
+    """
+    <div style="text-align: center;">
+        <blockquote style="font-size: 16px; border: none; display: inline-block; padding: 10px 20px; background-color: transparent; margin: 0;">
+            💫 <strong>“많은 사람을 옳은 데로 돌아오게 한 자는 별과 같이 영원토록 빛나리라”</strong> — 다니엘 12장 3절
+        </blockquote>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
 tab1, tab2, tab3 = st.tabs(["창체 생기부 생성", "교과세특 생기부 생성", "행발 생기부 생성"])
 
 # --- 탭 1: 창체 생기부 생성 ---
