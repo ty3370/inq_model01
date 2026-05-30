@@ -152,9 +152,18 @@ with tab1:
                 )
                 response = get_chatgpt_response(formatted_prompt, "messages_tab1")
                 
-                # 변경된 부분: 결과를 st.code로 출력하여 우측 상단에 복사 버튼 제공
+                # 변경된 부분: 가독성을 위해 st.info로 출력 (자동 줄바꿈 됨)
                 st.write("**생기부 생성 결과:**")
-                st.code(response, language=None)
+                st.info(response)
+                
+                # 자바스크립트 문자열 깨짐 방지 
+                escaped_res = response.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
+                st.components.v1.html(f"""
+                    <button onclick="navigator.clipboard.writeText(`{escaped_res}`).then(() => alert('📋 창체 생기부가 복사되었습니다!'))" 
+                    style="background-color: #FF4B4B; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                    📋 생기부 내용 복사하기
+                    </button>
+                """, height=45)
             
     st.subheader("생성 기록 (창체)")
     for message in st.session_state["messages_tab1"]:
@@ -162,7 +171,14 @@ with tab1:
             st.write(f"**You:** {message['content']}")
         elif message["role"] == "assistant":
             st.write("**생기부 생성기:**")
-            st.code(message["content"], language=None)
+            st.info(message["content"])
+            escaped_msg = message["content"].replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
+            st.components.v1.html(f"""
+                <button onclick="navigator.clipboard.writeText(`{escaped_msg}`).then(() => alert('📋 기록이 복사되었습니다!'))" 
+                style="background-color: #555555; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px;">
+                📋 내용 복사
+                </button>
+            """, height=40)
 
 
 # --- 탭 2: 교과세특 생기부 생성 ---
@@ -191,9 +207,17 @@ with tab2:
                 )
                 response = get_chatgpt_response(formatted_prompt, "messages_tab2")
                 
-                # 변경된 부분: 결과를 st.code로 출력하여 우측 상단에 복사 버튼 제공
+                # 변경된 부분: 가독성을 위해 st.info로 출력 (자동 줄바꿈 됨)
                 st.write("**생기부 생성 결과:**")
-                st.code(response, language=None)
+                st.info(response)
+                
+                escaped_res = response.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
+                st.components.v1.html(f"""
+                    <button onclick="navigator.clipboard.writeText(`{escaped_res}`).then(() => alert('📋 교과세특 생기부가 복사되었습니다!'))" 
+                    style="background-color: #FF4B4B; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                    📋 생기부 내용 복사하기
+                    </button>
+                """, height=45)
             
     st.subheader("생성 기록 (교과세특)")
     for message in st.session_state["messages_tab2"]:
@@ -201,7 +225,14 @@ with tab2:
             st.write(f"**You:** {message['content']}")
         elif message["role"] == "assistant":
             st.write("**생기부 생성기:**")
-            st.code(message["content"], language=None)
+            st.info(message["content"])
+            escaped_msg = message["content"].replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
+            st.components.v1.html(f"""
+                <button onclick="navigator.clipboard.writeText(`{escaped_msg}`).then(() => alert('📋 기록이 복사되었습니다!'))" 
+                style="background-color: #555555; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px;">
+                📋 내용 복사
+                </button>
+            """, height=40)
 
 
 # --- 탭 3: 행발 생기부 생성 ---
@@ -222,9 +253,17 @@ with tab3:
             else:
                 response = get_chatgpt_response(user_input3, "messages_tab3")
                 
-                # 변경된 부분: 결과를 st.code로 출력하여 우측 상단에 복사 버튼 제공
+                # 변경된 부분: 가독성을 위해 st.info로 출력 (자동 줄바꿈 됨)
                 st.write("**생기부 생성 결과:**")
-                st.code(response, language=None)
+                st.info(response)
+                
+                escaped_res = response.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
+                st.components.v1.html(f"""
+                    <button onclick="navigator.clipboard.writeText(`{escaped_res}`).then(() => alert('📋 행발 생기부가 복사되었습니다!'))" 
+                    style="background-color: #FF4B4B; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                    📋 생기부 내용 복사하기
+                    </button>
+                """, height=45)
             
     st.subheader("생성 기록 (행발)")
     for message in st.session_state["messages_tab3"]:
@@ -232,4 +271,11 @@ with tab3:
             st.write(f"**You:** {message['content']}")
         elif message["role"] == "assistant":
             st.write("**생기부 생성기:**")
-            st.code(message["content"], language=None)
+            st.info(message["content"])
+            escaped_msg = message["content"].replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
+            st.components.v1.html(f"""
+                <button onclick="navigator.clipboard.writeText(`{escaped_msg}`).then(() => alert('📋 기록이 복사되었습니다!'))" 
+                style="background-color: #555555; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px;">
+                📋 내용 복사
+                </button>
+            """, height=40)
