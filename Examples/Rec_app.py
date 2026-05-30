@@ -15,7 +15,7 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 
 # 초기 프롬프트 설정
 initial_prompt = (
-    "당신은 중학교 교사로, 학생들의 특성과 활동에 기반해 생활기록부를 작성해주어야 합니다."
+    "당신은 고등학교 교사로, 학생들의 특성과 활동에 기반해 생활기록부를 작성해주어야 합니다."
     "생활기록부 작성하는 말투는 -임. -함. 등으로 작성하세요."
     "시제는 언제나 현재 시제를 사용하세요."
     "따옴표 등의 기호를 되도록 사용하지 마세요. 기호는 그것을 쓰지 않으면 도저히 설명이 불가능한 상황에서만 사용합니다."
@@ -99,10 +99,25 @@ def get_chatgpt_response(prompt, key):
     st.session_state[key].append({"role": "assistant", "content": answer})
     return answer
 
-# Streamlit 앱 UI 설정
-st.title("생기부 작성 챗봇")
+# --- 세련된 UI 스타일 정의 (CSS 추가) ---
+st.set_page_config(layout="wide")
+st.markdown("""
+    <style>
+    .main .block-container { padding-top: 2rem; max-width: 1100px; }
+    h1 { color: #1E3A8A; font-weight: 700; margin-bottom: 1.5rem; }
+    h3 { color: #2563EB; font-weight: 600; margin-top: 1rem; }
+    .stAlert { border-radius: 8px; border: none; }
+    div[data-testid="stForm"] { border: 1px solid #E2E8F0; border-radius: 12px; padding: 2rem; background-color: #F8FAFC; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+    .user-bubble { background-color: #E0F2FE; color: #0369A1; padding: 0.75rem 1rem; border-radius: 12px 12px 0 12px; margin: 0.5rem 0 0.5rem auto; max-width: 80%; width: fit-content; font-size: 0.95rem; line-height: 1.5; }
+    .bot-bubble { background-color: #FFFFFF; color: #1E293B; padding: 0.75rem 1rem; border-radius: 12px 12px 12px 0; margin: 0.5rem auto 0.5rem 0; max-width: 80%; width: fit-content; border: 1px solid #E2E8F0; font-size: 0.95rem; line-height: 1.5; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .chat-container { background-color: #F1F5F9; border-radius: 12px; padding: 1.5rem; max-height: 500px; overflow-y: auto; border: 1px solid #E2E8F0; margin-top: 1rem; }
+    </style>
+""", unsafe_html=class_name)
 
-tab1, tab2, tab3 = st.tabs(["창체 생기부 생성", "교과세특 생기부 생성", "행발 생기부 생성"])
+# Streamlit 앱 UI 설정
+st.title("📝 생기부 작성 챗봇")
+
+tab1, tab2, tab3 = st.tabs(["✨ 창체 생기부 생성", "📚 교과세특 생기부 생성", "🌱 행발 생기부 생성"])
 
 # --- 탭 1: 창체 생기부 생성 ---
 with tab1:
@@ -110,12 +125,12 @@ with tab1:
     if "messages_tab1" not in st.session_state:
         st.session_state["messages_tab1"] = [{"role": "system", "content": initial_prompt + activity_prompt}]
     
-    st.info("자율활동 내용, 개별 활동 자료, 요청 사항을 입력하여 창체 생기부를 생성합니다.")
+    st.info("창체 내용과 날짜, 개별 활동 자료, 요청 사항을 입력하여 창체 생기부를 생성합니다.")
     
     with st.form(key='form_tab1', clear_on_submit=False):
-        act_date = st.text_input("자율활동 내용과 날짜:", placeholder="예시: 사이버폭력예방교육(2025.03.10.)", key="act_date")
+        act_date = st.text_input("창체 내용과 날짜:", placeholder="예시: 사이버폭력예방교육(2025.03.10.)", key="act_date")
         act_student_data = st.text_area("학생의 개별 활동 자료:", placeholder="예시: 온라인 공간에서의 예절 중요성을 알게 되었다고 발표함", key="act_student_data")
-        act_etc = st.text_input("기타 요청 사항:", placeholder="예시: 의사소통 역량을 부각할 것", key="act_etc")
+        act_etc = st.text_input("기타 요청 사항:", placeholder="예시: 의사소통 역량 강조", key="act_etc")
         
         submit_button1 = st.form_submit_button("생기부 생성")
         
@@ -129,14 +144,16 @@ with tab1:
                     f"기타 요청 사항: {act_etc}"
                 )
                 response = get_chatgpt_response(formatted_prompt, "messages_tab1")
-                st.write(f"**생기부봇:** {response}")
+                st.success("생기부가 성공적으로 생성되었습니다!")
             
-    st.subheader("대화 기록 (창체)")
+    st.subheader("💬 대화 기록 (창체)")
+    st.markdown('<div class="chat-container">', unsafe_html=True)
     for message in st.session_state["messages_tab1"]:
         if message["role"] == "user":
-            st.write(f"**You:** {message['content']}")
+            st.markdown(f'<div class="user-bubble"><b>You:</b><br>{message["content"].replace("\n", "<br>")}</div>', unsafe_html=True)
         elif message["role"] == "assistant":
-            st.write(f"**생기부봇:** {message['content']}")
+            st.markdown(f'<div class="bot-bubble"><b>생기부봇:</b><br>{message["content"].replace("\n", "<br>")}</div>', unsafe_html=True)
+    st.markdown('</div>', unsafe_html=True)
 
 
 # --- 탭 2: 교과세특 생기부 생성 ---
@@ -145,12 +162,12 @@ with tab2:
     if "messages_tab2" not in st.session_state:
         st.session_state["messages_tab2"] = [{"role": "system", "content": initial_prompt + subject_prompt}]
         
-    st.info("교과 설명, 개별 활동 자료, 요청 사항을 입력하여 교과세특 생기부를 생성합니다.")
+    st.info("활동 내용, 개별 활동 자료, 요청 사항을 입력하여 교과세특 생기부를 생성합니다.")
     
     with st.form(key='form_tab2', clear_on_submit=False):
         sub_desc = st.text_input("교과세특 활동 내용에 관한 간략한 설명:", placeholder="예시: 운동량과 충격량 전환이 적용된 사례 발표", key="sub_desc")
         sub_student_data = st.text_area("학생의 개별 활동 자료:", placeholder="예시: 안전모의 원리를 발표함", key="sub_student_data")
-        sub_etc = st.text_input("기타 요청 사항:", placeholder="예시: 과학적 사고력과 창의성을 부각할 것", key="sub_etc")
+        sub_etc = st.text_input("기타 요청 사항:", placeholder="예시: 과학적 사고력과 창의성 강조", key="sub_etc")
         
         submit_button2 = st.form_submit_button("생기부 생성")
         
@@ -164,14 +181,16 @@ with tab2:
                     f"기타 요청 사항: {sub_etc}"
                 )
                 response = get_chatgpt_response(formatted_prompt, "messages_tab2")
-                st.write(f"**생기부봇:** {response}")
+                st.success("생기부가 성공적으로 생성되었습니다!")
             
-    st.subheader("대화 기록 (교과세특)")
+    st.subheader("💬 대화 기록 (교과세특)")
+    st.markdown('<div class="chat-container">', unsafe_html=True)
     for message in st.session_state["messages_tab2"]:
         if message["role"] == "user":
-            st.write(f"**You:** {message['content']}")
+            st.markdown(f'<div class="user-bubble"><b>You:</b><br>{message["content"].replace("\n", "<br>")}</div>', unsafe_html=True)
         elif message["role"] == "assistant":
-            st.write(f"**생기부봇:** {message['content']}")
+            st.markdown(f'<div class="bot-bubble"><b>생기부봇:</b><br>{message["content"].replace("\n", "<br>")}</div>', unsafe_html=True)
+    st.markdown('</div>', unsafe_html=True)
 
 
 # --- 탭 3: 행발 생기부 생성 ---
@@ -191,11 +210,13 @@ with tab3:
                 st.warning("내용을 입력해 주세요.")
             else:
                 response = get_chatgpt_response(user_input3, "messages_tab3")
-                st.write(f"**생기부봇:** {response}")
+                st.success("생기부가 성공적으로 생성되었습니다!")
             
-    st.subheader("대화 기록 (행발)")
+    st.subheader("💬 대화 기록 (행발)")
+    st.markdown('<div class="chat-container">', unsafe_html=True)
     for message in st.session_state["messages_tab3"]:
         if message["role"] == "user":
-            st.write(f"**You:** {message['content']}")
+            st.markdown(f'<div class="user-bubble"><b>You:</b><br>{message["content"].replace("\n", "<br>")}</div>', unsafe_html=True)
         elif message["role"] == "assistant":
-            st.write(f"**생기부봇:** {message['content']}")
+            st.markdown(f'<div class="bot-bubble"><b>생기부봇:</b><br>{message["content"].replace("\n", "<br>")}</div>', unsafe_html=True)
+    st.markdown('</div>', unsafe_html=True)
