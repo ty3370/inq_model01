@@ -79,13 +79,13 @@ activity_prompt = (
     "올바른 예시 3) 성폭력예방교육(2025.05.09.)에서 경청의 중요성을 강조하며 친구들과의 협력을 제안함."
     "잘못된 예시 4) 1학기 학급자치회 회장 활동을 하며 다양한 행사의 기획과 실행을 통해 학생들의 참여도를 높이며 학급 단합을 이룸. 수행평가와 과제 제출 일정을 학우들에게 정확하게 공지하여 학업 활동 지원에 기여함. 동료들과의 소통을 통해 학급 운영을 원활히 하고 학우들에게 긍정적인 영향을 미침."
     "올바른 예시 4) 1학기 학급자치회 회장(2025.03.01.-2025.08.10.)으로 다양한 행사의 기획과 실행을 통해 학생들의 참여도를 높이며 학급 단합을 이룸. 수행평가와 과제 제출 일정을 학우들에게 정확하게 공지하여 학업 활동 지원에 기여함. 동료들과의 소통을 통해 학급 운영을 원활히 하고 학우들에게 긍정적인 영향을 미침."
-    "위의 예시와 같이 자율활동 내용과 날짜를 예시의 양식 그대로 지키면서 최대한 풍성하게 써야 합니다."
+    "위의 예시와 같이 자율활동 내용과 날짜를 예시의 양식 그대로 지키면서 최대한 풍성하게 써야 합니다. (가능하면 10줄 이상)"
 )
 
 # 교과세특 추가 프롬프트
 subject_prompt = (
     "당신은 생기부 교과세특 내용을 생성하는 ai입니다. 사용자는 교과세특 활동 내용에 관한 간략한 설명, 학생의 개별 활동 자료, 기타 요청 사항를 입력할 것입니다."
-    "학생의 개별 활동 자료를 중심으로 최대한 풍부하게 교과 세특을 생성하세요."
+    "학생의 개별 활동 자료를 중심으로 최대한 풍부하게 교과 세특을 생성하세요. (가능하면 10줄 이상)"
 )
 
 # GPT 응답 함수
@@ -102,7 +102,7 @@ def get_chatgpt_response(prompt, key):
 # Streamlit 앱 UI 설정
 st.set_page_config(
     page_title="생기부 자동 생성기",
-    page_icon="https://i.imgur.com/BW1HzjZ.png",
+    page_icon="💫",
     layout="wide"
 )
 
@@ -151,14 +151,18 @@ with tab1:
                     f"기타 요청 사항: {act_etc}"
                 )
                 response = get_chatgpt_response(formatted_prompt, "messages_tab1")
-                st.write(f"**생기부 생성기:** {response}")
+                
+                # 변경된 부분: 결과를 st.code로 출력하여 우측 상단에 복사 버튼 제공
+                st.write("**생기부 생성 결과:**")
+                st.code(response, language=None)
             
     st.subheader("생성 기록 (창체)")
     for message in st.session_state["messages_tab1"]:
         if message["role"] == "user":
             st.write(f"**You:** {message['content']}")
         elif message["role"] == "assistant":
-            st.write(f"**생기부 생성기:** {message['content']}")
+            st.write("**생기부 생성기:**")
+            st.code(message["content"], language=None)
 
 
 # --- 탭 2: 교과세특 생기부 생성 ---
@@ -186,14 +190,18 @@ with tab2:
                     f"기타 요청 사항: {sub_etc}"
                 )
                 response = get_chatgpt_response(formatted_prompt, "messages_tab2")
-                st.write(f"**생기부 생성기:** {response}")
+                
+                # 변경된 부분: 결과를 st.code로 출력하여 우측 상단에 복사 버튼 제공
+                st.write("**생기부 생성 결과:**")
+                st.code(response, language=None)
             
     st.subheader("생성 기록 (교과세특)")
     for message in st.session_state["messages_tab2"]:
         if message["role"] == "user":
             st.write(f"**You:** {message['content']}")
         elif message["role"] == "assistant":
-            st.write(f"**생기부 생성기:** {message['content']}")
+            st.write("**생기부 생성기:**")
+            st.code(message["content"], language=None)
 
 
 # --- 탭 3: 행발 생기부 생성 ---
@@ -213,11 +221,15 @@ with tab3:
                 st.warning("내용을 입력해 주세요.")
             else:
                 response = get_chatgpt_response(user_input3, "messages_tab3")
-                st.write(f"**생기부 생성기:** {response}")
+                
+                # 변경된 부분: 결과를 st.code로 출력하여 우측 상단에 복사 버튼 제공
+                st.write("**생기부 생성 결과:**")
+                st.code(response, language=None)
             
     st.subheader("생성 기록 (행발)")
     for message in st.session_state["messages_tab3"]:
         if message["role"] == "user":
             st.write(f"**You:** {message['content']}")
         elif message["role"] == "assistant":
-            st.write(f"**생기부 생성기:** {message['content']}")
+            st.write("**생기부 생성기:**")
+            st.code(message["content"], language=None)
