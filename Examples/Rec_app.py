@@ -63,6 +63,7 @@ initial_prompt = (
     "서술어는 반드시 교사가 관찰 가능한 내용이어야 합니다. 예를 들어, '생각함' 대신 '생각했다고 진술함', '깨달음' 대신 '깨달았다고 보고서를 작성함', '알게 됨' 대신 '알게 되었다고 발표함' 등 교사가 관찰할 수 있는 내용으로 써야 합니다."
     "지양할 표현 예시(교사가 관찰 불가능): ~ 라고 느낌. ~ 대해 생각함. ~ 생각해 봄. ~ 배움."
     "적절한 표현 예시(교사가 관찰 가능): ~에 대한 활동지를 작성함. ~에 대해 느낀 점을 충실하게 작성함. ~에 대해 생각하는 시간을 가짐. ~을 활동지에 기록함. ~으로 표현함. ~하다는 포부를 밝힘. ~하는 모습을 보임. ~한 모습이 돋보임. ~에 대해 좀 더 심도 있게 탐구함. ~ 하는 능력이 뛰어남. ~하여 학생들에게 좋은 반응을 얻음."
+    "최대한 풍성하게 써야 합니다. (가능하면 10줄 이상)"
 )
 
 # 창체 추가 프롬프트
@@ -159,9 +160,9 @@ with tab1:
                 # 자바스크립트 문자열 깨짐 방지 
                 escaped_res = response.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
                 st.components.v1.html(f"""
-                    <button onclick="navigator.clipboard.writeText(`{escaped_res}`).then(() => alert('📋 창체 생기부가 복사되었습니다!'))" 
+                    <button onclick="navigator.clipboard.writeText(`{escaped_res}`).then(() => alert('복사되었습니다!'))" 
                     style="background-color: #FF4B4B; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">
-                    📋 생기부 내용 복사하기
+                    생기부 내용 복사하기
                     </button>
                 """, height=45)
             
@@ -174,9 +175,9 @@ with tab1:
             st.info(message["content"])
             escaped_msg = message["content"].replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
             st.components.v1.html(f"""
-                <button onclick="navigator.clipboard.writeText(`{escaped_msg}`).then(() => alert('📋 기록이 복사되었습니다!'))" 
+                <button onclick="navigator.clipboard.writeText(`{escaped_msg}`).then(() => alert('복사되었습니다!'))" 
                 style="background-color: #555555; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px;">
-                📋 내용 복사
+                내용 복사
                 </button>
             """, height=40)
 
@@ -213,9 +214,9 @@ with tab2:
                 
                 escaped_res = response.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
                 st.components.v1.html(f"""
-                    <button onclick="navigator.clipboard.writeText(`{escaped_res}`).then(() => alert('📋 교과세특 생기부가 복사되었습니다!'))" 
+                    <button onclick="navigator.clipboard.writeText(`{escaped_res}`).then(() => alert('복사되었습니다!'))" 
                     style="background-color: #FF4B4B; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">
-                    📋 생기부 내용 복사하기
+                    생기부 내용 복사하기
                     </button>
                 """, height=45)
             
@@ -228,9 +229,9 @@ with tab2:
             st.info(message["content"])
             escaped_msg = message["content"].replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
             st.components.v1.html(f"""
-                <button onclick="navigator.clipboard.writeText(`{escaped_msg}`).then(() => alert('📋 기록이 복사되었습니다!'))" 
+                <button onclick="navigator.clipboard.writeText(`{escaped_msg}`).then(() => alert('복사되었습니다!'))" 
                 style="background-color: #555555; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px;">
-                📋 내용 복사
+                내용 복사
                 </button>
             """, height=40)
 
@@ -259,9 +260,9 @@ with tab3:
                 
                 escaped_res = response.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
                 st.components.v1.html(f"""
-                    <button onclick="navigator.clipboard.writeText(`{escaped_res}`).then(() => alert('📋 행발 생기부가 복사되었습니다!'))" 
+                    <button onclick="navigator.clipboard.writeText(`{escaped_res}`).then(() => alert('복사되었습니다!'))" 
                     style="background-color: #FF4B4B; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">
-                    📋 생기부 내용 복사하기
+                    생기부 내용 복사하기
                     </button>
                 """, height=45)
             
@@ -274,8 +275,8 @@ with tab3:
             st.info(message["content"])
             escaped_msg = message["content"].replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
             st.components.v1.html(f"""
-                <button onclick="navigator.clipboard.writeText(`{escaped_msg}`).then(() => alert('📋 기록이 복사되었습니다!'))" 
+                <button onclick="navigator.clipboard.writeText(`{escaped_msg}`).then(() => alert('복사되었습니다!'))" 
                 style="background-color: #555555; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px;">
-                📋 내용 복사
+                내용 복사
                 </button>
             """, height=40)
