@@ -140,7 +140,7 @@ with tab1:
     
     with st.form(key='form_tab1', clear_on_submit=False):
         act_date = st.text_input("창체 내용과 날짜:", placeholder="예시: 사이버폭력예방교육(2025.03.10.)", key="act_date")
-        act_student_data = st.text_area("학생의 개별 활동 자료(정리되지 않은 형태도 가능):", placeholder="예시: 온라인 예절의 중요성 발표", key="act_student_data")
+        act_student_data = st.text_area("학생의 개별 활동 자료(정리되지 않은 형태도 가능):", placeholder="예시: 온라인 예절의 중요성에 관해 이러이러한 내용 작성", key="act_student_data")
         act_etc = st.text_input("기타 요청 사항:", placeholder="예시: 의사소통 역량 강조", key="act_etc")
         
         submit_button1 = st.form_submit_button("생기부 생성")
@@ -195,7 +195,7 @@ with tab2:
     
     with st.form(key='form_tab2', clear_on_submit=False):
         sub_desc = st.text_input("교과세특 활동 내용에 관한 간략한 설명:", placeholder="예시: 운동량과 충격량 전환이 적용된 사례 발표", key="sub_desc")
-        sub_student_data = st.text_area("학생의 개별 활동 자료(정리되지 않은 형태도 가능):", placeholder="예시: 안전모의 원리 발표", key="sub_student_data")
+        sub_student_data = st.text_area("학생의 개별 활동 자료(정리되지 않은 형태도 가능):", placeholder="예시: 안전모의 원리에 대해 이러이러한 내용 발표", key="sub_student_data")
         sub_etc = st.text_input("기타 요청 사항:", placeholder="예시: 과학적 사고력과 창의성 강조", key="sub_etc")
         
         submit_button2 = st.form_submit_button("생기부 생성")
