@@ -166,7 +166,7 @@ with tab2:
     if "messages_tab2" not in st.session_state:
         st.session_state["messages_tab2"] = [{"role": "system", "content": initial_prompt + subject_prompt}]
         
-    st.info("활동 내용, 개별 활동 자료, 요청 사항을 입력하여 교과세특 생기부를 생성합니다.")
+    st.info("교과 활동 내용의 간략한 설명, 개별 활동 자료, 요청 사항을 입력하여 교과세특 생기부를 생성합니다.")
     
     with st.form(key='form_tab2', clear_on_submit=False):
         sub_desc = st.text_input("교과세특 활동 내용에 관한 간략한 설명:", placeholder="예시: 운동량과 충격량 전환이 적용된 사례 발표", key="sub_desc")
