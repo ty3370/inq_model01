@@ -102,6 +102,7 @@ def get_chatgpt_response(prompt, key):
 # Streamlit 앱 UI 설정
 st.set_page_config(
     page_title="생기부 자동 생성기",
+    page_icon="https://i.imgur.com/BW1HzjZ.png",
     layout="wide"
 )
 
