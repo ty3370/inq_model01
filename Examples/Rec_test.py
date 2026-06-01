@@ -136,7 +136,7 @@ st.markdown(
 )
 
 # 탭 구성을 4개로 확장
-tab1, tab2, tab3, tab4 = st.tabs(["창체 생기부 생성", "교과세특 생기부 생성", "행발 생기부 생성", "이미지 텍스트 추출 (OCR)"])
+tab1, tab2, tab3, tab4 = st.tabs(["창체 생기부 생성", "교과세특 생기부 생성", "행발 생기부 생성", "이미지 텍스트 추출"])
 
 # --- 탭 1: 창체 생기부 생성 ---
 with tab1:
@@ -388,13 +388,13 @@ with tab4:
                 except Exception as e:
                     st.error(f"Gemini API 통신 오류: {e}")
                     
-        # 2. 이미지 파일 처리 구문
+        # 2. 이미지 파일 처리 구문 (PDF와 동일하게 파일명만 표시하도록 수정)
         else:
-            image = Image.open(uploaded_file)
-            st.image(image, caption="📄 업로드된 문서", use_container_width=True)
+            st.write(f"📄 업로드된 문서: **{uploaded_file.name}**")
             
             with st.spinner("문서를 읽어오는 중입니다..."):
                 try:
+                    image = Image.open(uploaded_file)
                     response_gemini = gemini_client.models.generate_content(
                         model='gemini-2.5-flash',
                         contents=[
