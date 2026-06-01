@@ -2,16 +2,23 @@ import streamlit as st
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
+from google import genai
+from google.genai import types
+from PIL import Image
 
 # 환경 변수 로드
 load_dotenv()
 
-# OpenAI API 키 및 모델 설정
+# API 키 및 모델 설정
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
 MODEL = 'gpt-4o'
 
-# OpenAI API 클라이언트 초기화
+# 요청하신 명칭으로 제미나이 API 키 설정
+GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
+
+# API 클라이언트 초기화
 client = OpenAI(api_key=OPENAI_API_KEY)
+gemini_client = genai.Client(api_key=GOOGLE_API_KEY)
 
 # 초기 프롬프트 설정
 initial_prompt = (
@@ -128,7 +135,8 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-tab1, tab2, tab3 = st.tabs(["창체 생기부 생성", "교과세특 생기부 생성", "행발 생기부 생성"])
+# 탭 구성을 4개로 확장
+tab1, tab2, tab3, tab4 = st.tabs(["창체 생기부 생성", "교과세특 생기부 생성", "행발 생기부 생성", "이미지 텍스트 추출"])
 
 # --- 탭 1: 창체 생기부 생성 ---
 with tab1:
@@ -156,11 +164,9 @@ with tab1:
                 )
                 response = get_chatgpt_response(formatted_prompt, "messages_tab1")
                 
-                # 변경된 부분: 가독성을 위해 st.info로 출력 (자동 줄바꿈 됨)
                 st.write("**생기부 생성 결과:**")
                 st.info(response)
                 
-                # 자바스크립트 문자열 깨짐 방지 
                 escaped_res = response.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
                 st.components.v1.html(f"""
                     <button id="copyBtn1" onclick="
@@ -231,7 +237,6 @@ with tab2:
                 )
                 response = get_chatgpt_response(formatted_prompt, "messages_tab2")
                 
-                # 변경된 부분: 가독성을 위해 st.info로 출력 (자동 줄바꿈 됨)
                 st.write("**생기부 생성 결과:**")
                 st.info(response)
                 
@@ -297,7 +302,6 @@ with tab3:
             else:
                 response = get_chatgpt_response(user_input3, "messages_tab3")
                 
-                # 변경된 부분: 가독성을 위해 st.info로 출력 (자동 줄바꿈 됨)
                 st.write("**생기부 생성 결과:**")
                 st.info(response)
                 
@@ -343,3 +347,86 @@ with tab3:
                 내용 복사
                 </button>
             """, height=40)
+
+# --- 탭 4: 이미지 및 PDF 텍스트 추출 ---
+with tab4:
+    st.subheader("이미지 및 PDF 텍스트 추출")
+    st.info("학생 활동지, 메모, 서류 등의 이미지 파일(PNG, JPG)이나 PDF 파일을 업로드하면 내용을 텍스트로 변환합니다.")
+    
+    # 파일 업로더 형식
+    uploaded_file = st.file_uploader("텍스트를 추출할 이미지 또는 PDF 파일 업로드", type=["png", "jpg", "jpeg", "pdf"])
+    
+    if uploaded_file is not None:
+        file_type = uploaded_file.type
+        extracted_text = ""
+        
+        # 1. PDF 파일 처리 구문 (오류 수정 반영)
+        if file_type == "application/pdf":
+            st.write(f"📄 업로드된 문서: **{uploaded_file.name}**")
+            
+            with st.spinner("문서를 읽어오는 중입니다..."):
+                try:
+                    # PDF 바이너리 읽기
+                    pdf_data = uploaded_file.read()
+                    
+                    # google-genai SDK 규격에 맞는 Part 객체로 생성
+                    pdf_part = types.Part.from_bytes(
+                        data=pdf_data,
+                        mime_type="application/pdf",
+                    )
+                    
+                    # Gemini API 호출
+                    response_gemini = gemini_client.models.generate_content(
+                        model='gemini-2.5-flash',
+                        contents=[
+                            pdf_part,
+                            "이 문서에 적힌 모든 글자를 분석해서 그대로 텍스트로 추출해줘. 다른 설명이나 인사말은 절대 하지 말고 오직 추출된 텍스트만 보여줘."
+                        ]
+                    )
+                    extracted_text = response_gemini.text
+                    st.success("PDF 텍스트 추출 완료!")
+                except Exception as e:
+                    st.error(f"Gemini API 통신 오류: {e}")
+                    
+        # 2. 이미지 파일 처리 구문 (PDF와 동일하게 파일명만 표시하도록 수정)
+        else:
+            st.write(f"📄 업로드된 문서: **{uploaded_file.name}**")
+            
+            with st.spinner("문서를 읽어오는 중입니다..."):
+                try:
+                    image = Image.open(uploaded_file)
+                    response_gemini = gemini_client.models.generate_content(
+                        model='gemini-2.5-flash',
+                        contents=[
+                            image, 
+                            "이 이미지에 적힌 모든 글자를 분석해서 그대로 텍스트로 추출해줘. 다른 설명이나 인사말은 절대 하지 말고 오직 추출된 텍스트만 보여줘."
+                        ]
+                    )
+                    extracted_text = response_gemini.text
+                    st.success("이미지 텍스트 추출 완료!")
+                except Exception as e:
+                    st.error(f"Gemini API 통신 오류: {e}")
+        
+        # 3. 결과 표시 및 복사 기능 (공통 구문 - 타 탭과 양식 통일)
+        if extracted_text:
+            st.write("**텍스트 추출 결과:**")
+            st.info(extracted_text)
+            
+            # 자바스크립트 내 문자열 깨짐 방지 처리
+            escaped_text = extracted_text.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
+            st.components.v1.html(f"""
+                <button id="copyBtnOCR" onclick="
+                    navigator.clipboard.writeText(`{escaped_text}`).then(() => {{
+                        const btn = document.getElementById('copyBtnOCR');
+                        btn.innerText = '✅ 복사 완료!';
+                        btn.style.backgroundColor = '#28a745';
+                        setTimeout(() => {{
+                            btn.innerText = '추출된 텍스트 복사하기';
+                            btn.style.backgroundColor = '#FF4B4B';
+                        }}, 1500);
+                    }})
+                " 
+                style="background-color: #FF4B4B; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
+                추출된 텍스트 복사하기
+                </button>
+            """, height=45)
