@@ -351,7 +351,7 @@ with tab3:
 # --- 탭 4: 이미지 및 PDF 텍스트 추출 ---
 with tab4:
     st.subheader("이미지 및 PDF 텍스트 추출")
-    st.info("학생 활동지, 메모, 서류 등의 이미지 파일(PNG, JPG)이나 PDF 파일을 업로드하면 내용을 텍스트로 변환합니다.")
+    st.info("학생 활동 자료를 이미지나 PDF로 모아두신 선생님들을 위한 탭입니다. 학생 활동지, 메모, 서류 등의 이미지 파일(PNG, JPG)이나 PDF 파일을 업로드하면 내용을 텍스트로 변환합니다.")
     
     # 파일 업로더 형식
     uploaded_file = st.file_uploader("텍스트를 추출할 이미지 또는 PDF 파일 업로드", type=["png", "jpg", "jpeg", "pdf"])
