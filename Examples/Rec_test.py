@@ -348,10 +348,10 @@ with tab3:
                 </button>
             """, height=40)
 
-# --- 탭 4: 이미지 및 PDF 텍스트 추출 (순수 OCR 기능만 수행) ---
+# --- 탭 4: 이미지 및 PDF 텍스트 추출 ---
 with tab4:
-    st.subheader("이미지 및 PDF 텍스트 추출 (Gemini OCR)")
-    st.info("학생 활동지, 메모, 서류 등의 이미지 파일(PNG, JPG)이나 PDF 파일을 업로드하면 Gemini API가 이미지 및 문서 속 글자를 텍스트로 똑같이 읽어줍니다.")
+    st.subheader("이미지 및 PDF 텍스트 추출")
+    st.info("학생 활동지, 메모, 서류 등의 이미지 파일(PNG, JPG)이나 PDF 파일을 업로드하면 내용을 텍스트로 변환합니다.")
     
     # 파일 업로더 형식
     uploaded_file = st.file_uploader("텍스트를 추출할 이미지 또는 PDF 파일 업로드", type=["png", "jpg", "jpeg", "pdf"])
@@ -364,7 +364,7 @@ with tab4:
         if file_type == "application/pdf":
             st.write(f"📄 업로드된 문서: **{uploaded_file.name}**")
             
-            with st.spinner("Gemini가 PDF 전체 문서를 분석하여 읽어오는 중입니다..."):
+            with st.spinner("문서를 읽어오는 중입니다..."):
                 try:
                     # PDF 바이너리 읽기
                     pdf_data = uploaded_file.read()
@@ -380,7 +380,7 @@ with tab4:
                         model='gemini-2.5-flash',
                         contents=[
                             pdf_part,
-                            "이 PDF 문서에 적힌 모든 글자를 분석해서 그대로 텍스트로 추출해줘. 다른 설명이나 인사말은 절대 하지 말고 오직 추출된 텍스트만 보여줘."
+                            "이 문서에 적힌 모든 글자를 분석해서 그대로 텍스트로 추출해줘. 다른 설명이나 인사말은 절대 하지 말고 오직 추출된 텍스트만 보여줘."
                         ]
                     )
                     extracted_text = response_gemini.text
@@ -391,9 +391,9 @@ with tab4:
         # 2. 이미지 파일 처리 구문
         else:
             image = Image.open(uploaded_file)
-            st.image(image, caption="업로드된 이미지", use_container_width=True)
+            st.image(image, caption="📄 업로드된 문서", use_container_width=True)
             
-            with st.spinner("이미지에서 글자를 분석하여 읽어오는 중입니다..."):
+            with st.spinner("문서를 읽어오는 중입니다..."):
                 try:
                     response_gemini = gemini_client.models.generate_content(
                         model='gemini-2.5-flash',
@@ -407,13 +407,13 @@ with tab4:
                 except Exception as e:
                     st.error(f"Gemini API 통신 오류: {e}")
         
-        # 3. 결과 표시 및 복사 기능 (공통 구문)
+        # 3. 결과 표시 및 복사 기능 (공통 구문 - 타 탭과 양식 통일)
         if extracted_text:
-            # 추출된 결과를 편집하거나 복사할 수 있도록 텍스트 영역에 노출
-            edited_text = st.text_area("추출된 텍스트 내용 (필요시 수정 가능):", value=extracted_text, height=300)
+            st.write("**텍스트 추출 결과:**")
+            st.info(extracted_text)
             
             # 자바스크립트 내 문자열 깨짐 방지 처리
-            escaped_text = edited_text.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
+            escaped_text = extracted_text.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
             st.components.v1.html(f"""
                 <button id="copyBtnOCR" onclick="
                     navigator.clipboard.writeText(`{escaped_text}`).then(() => {{
@@ -421,12 +421,12 @@ with tab4:
                         btn.innerText = '✅ 복사 완료!';
                         btn.style.backgroundColor = '#28a745';
                         setTimeout(() => {{
-                            btn.innerText = '추출된 텍스트 전체 복사하기';
-                            btn.style.backgroundColor = '#007BFF';
+                            btn.innerText = '추출된 텍스트 복사하기';
+                            btn.style.backgroundColor = '#FF4B4B';
                         }}, 1500);
                     }})
                 " 
-                style="background-color: #007BFF; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
-                추출된 텍스트 전체 복사하기
+                style="background-color: #FF4B4B; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
+                추출된 텍스트 복사하기
                 </button>
-            """, height=50)
+            """, height=45)
