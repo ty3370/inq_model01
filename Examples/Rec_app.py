@@ -163,14 +163,24 @@ with tab1:
                 # 자바스크립트 문자열 깨짐 방지 
                 escaped_res = response.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
                 st.components.v1.html(f"""
-                    <button onclick="navigator.clipboard.writeText(`{escaped_res}`).then(() => alert('복사되었습니다!'))" 
-                    style="background-color: #FF4B4B; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                    <button id="copyBtn1" onclick="
+                        navigator.clipboard.writeText(`{escaped_res}`).then(() => {{
+                            const btn = document.getElementById('copyBtn1');
+                            btn.innerText = '✅ 복사 완료!';
+                            btn.style.backgroundColor = '#28a745';
+                            setTimeout(() => {{
+                                btn.innerText = '생기부 내용 복사하기';
+                                btn.style.backgroundColor = '#FF4B4B';
+                            }}, 1500);
+                        }})
+                    " 
+                    style="background-color: #FF4B4B; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
                     생기부 내용 복사하기
                     </button>
                 """, height=45)
             
     st.subheader("생성 기록 (창체)")
-    for message in st.session_state["messages_tab1"]:
+    for i, message in enumerate(st.session_state["messages_tab1"]):
         if message["role"] == "user":
             st.write(f"**You:** {message['content']}")
         elif message["role"] == "assistant":
@@ -178,8 +188,18 @@ with tab1:
             st.info(message["content"])
             escaped_msg = message["content"].replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
             st.components.v1.html(f"""
-                <button onclick="navigator.clipboard.writeText(`{escaped_msg}`).then(() => alert('복사되었습니다!'))" 
-                style="background-color: #555555; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px;">
+                <button id="historyBtn1_{i}" onclick="
+                    navigator.clipboard.writeText(`{escaped_msg}`).then(() => {{
+                        const btn = document.getElementById('historyBtn1_{i}');
+                        btn.innerText = '✅ 완료';
+                        btn.style.backgroundColor = '#28a745';
+                        setTimeout(() => {{
+                            btn.innerText = '내용 복사';
+                            btn.style.backgroundColor = '#555555';
+                        }}, 1500);
+                    }})
+                " 
+                style="background-color: #555555; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; transition: all 0.3s;">
                 내용 복사
                 </button>
             """, height=40)
@@ -217,14 +237,24 @@ with tab2:
                 
                 escaped_res = response.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
                 st.components.v1.html(f"""
-                    <button onclick="navigator.clipboard.writeText(`{escaped_res}`).then(() => alert('복사되었습니다!'))" 
-                    style="background-color: #FF4B4B; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                    <button id="copyBtn2" onclick="
+                        navigator.clipboard.writeText(`{escaped_res}`).then(() => {{
+                            const btn = document.getElementById('copyBtn2');
+                            btn.innerText = '✅ 복사 완료!';
+                            btn.style.backgroundColor = '#28a745';
+                            setTimeout(() => {{
+                                btn.innerText = '생기부 내용 복사하기';
+                                btn.style.backgroundColor = '#FF4B4B';
+                            }}, 1500);
+                        }})
+                    " 
+                    style="background-color: #FF4B4B; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
                     생기부 내용 복사하기
                     </button>
                 """, height=45)
             
     st.subheader("생성 기록 (교과세특)")
-    for message in st.session_state["messages_tab2"]:
+    for i, message in enumerate(st.session_state["messages_tab2"]):
         if message["role"] == "user":
             st.write(f"**You:** {message['content']}")
         elif message["role"] == "assistant":
@@ -232,8 +262,18 @@ with tab2:
             st.info(message["content"])
             escaped_msg = message["content"].replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
             st.components.v1.html(f"""
-                <button onclick="navigator.clipboard.writeText(`{escaped_msg}`).then(() => alert('복사되었습니다!'))" 
-                style="background-color: #555555; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px;">
+                <button id="historyBtn2_{i}" onclick="
+                    navigator.clipboard.writeText(`{escaped_msg}`).then(() => {{
+                        const btn = document.getElementById('historyBtn2_{i}');
+                        btn.innerText = '✅ 완료';
+                        btn.style.backgroundColor = '#28a745';
+                        setTimeout(() => {{
+                            btn.innerText = '내용 복사';
+                            btn.style.backgroundColor = '#555555';
+                        }}, 1500);
+                    }})
+                " 
+                style="background-color: #555555; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; transition: all 0.3s;">
                 내용 복사
                 </button>
             """, height=40)
@@ -263,14 +303,24 @@ with tab3:
                 
                 escaped_res = response.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
                 st.components.v1.html(f"""
-                    <button onclick="navigator.clipboard.writeText(`{escaped_res}`).then(() => alert('복사되었습니다!'))" 
-                    style="background-color: #FF4B4B; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                    <button id="copyBtn3" onclick="
+                        navigator.clipboard.writeText(`{escaped_res}`).then(() => {{
+                            const btn = document.getElementById('copyBtn3');
+                            btn.innerText = '✅ 복사 완료!';
+                            btn.style.backgroundColor = '#28a745';
+                            setTimeout(() => {{
+                                btn.innerText = '생기부 내용 복사하기';
+                                btn.style.backgroundColor = '#FF4B4B';
+                            }}, 1500);
+                        }})
+                    " 
+                    style="background-color: #FF4B4B; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
                     생기부 내용 복사하기
                     </button>
                 """, height=45)
             
     st.subheader("생성 기록 (행발)")
-    for message in st.session_state["messages_tab3"]:
+    for i, message in enumerate(st.session_state["messages_tab3"]):
         if message["role"] == "user":
             st.write(f"**You:** {message['content']}")
         elif message["role"] == "assistant":
@@ -278,8 +328,18 @@ with tab3:
             st.info(message["content"])
             escaped_msg = message["content"].replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
             st.components.v1.html(f"""
-                <button onclick="navigator.clipboard.writeText(`{escaped_msg}`).then(() => alert('복사되었습니다!'))" 
-                style="background-color: #555555; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px;">
+                <button id="historyBtn3_{i}" onclick="
+                    navigator.clipboard.writeText(`{escaped_msg}`).then(() => {{
+                        const btn = document.getElementById('historyBtn3_{i}');
+                        btn.innerText = '✅ 완료';
+                        btn.style.backgroundColor = '#28a745';
+                        setTimeout(() => {{
+                            btn.innerText = '내용 복사';
+                            btn.style.backgroundColor = '#555555';
+                        }}, 1500);
+                    }})
+                " 
+                style="background-color: #555555; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; transition: all 0.3s;">
                 내용 복사
                 </button>
             """, height=40)
