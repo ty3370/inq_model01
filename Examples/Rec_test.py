@@ -3,6 +3,7 @@ from openai import OpenAI
 import os
 from dotenv import load_dotenv
 from google import genai
+from google.genai import types
 from PIL import Image
 
 # 환경 변수 로드
@@ -347,34 +348,38 @@ with tab3:
                 </button>
             """, height=40)
 
-
 # --- 탭 4: 이미지 및 PDF 텍스트 추출 (순수 OCR 기능만 수행) ---
 with tab4:
     st.subheader("이미지 및 PDF 텍스트 추출 (Gemini OCR)")
     st.info("학생 활동지, 메모, 서류 등의 이미지 파일(PNG, JPG)이나 PDF 파일을 업로드하면 Gemini API가 이미지 및 문서 속 글자를 텍스트로 똑같이 읽어줍니다.")
     
-    # 파일 업로더 형식에 pdf 추가
+    # 파일 업로더 형식
     uploaded_file = st.file_uploader("텍스트를 추출할 이미지 또는 PDF 파일 업로드", type=["png", "jpg", "jpeg", "pdf"])
     
     if uploaded_file is not None:
         file_type = uploaded_file.type
         extracted_text = ""
         
-        # 1. PDF 파일 처리 구문
+        # 1. PDF 파일 처리 구문 (오류 수정 반영)
         if file_type == "application/pdf":
             st.write(f"📄 업로드된 문서: **{uploaded_file.name}**")
             
             with st.spinner("Gemini가 PDF 전체 문서를 분석하여 읽어오는 중입니다..."):
                 try:
-                    # PDF 바이너리 데이터를 Gemini API 포맷에 맞게 직접 전달
+                    # PDF 바이너리 읽기
                     pdf_data = uploaded_file.read()
+                    
+                    # google-genai SDK 규격에 맞는 Part 객체로 생성
+                    pdf_part = types.Part.from_bytes(
+                        data=pdf_data,
+                        mime_type="application/pdf",
+                    )
+                    
+                    # Gemini API 호출
                     response_gemini = gemini_client.models.generate_content(
                         model='gemini-2.5-flash',
                         contents=[
-                            {
-                                "mime_type": "application/pdf",
-                                "data": pdf_data
-                            },
+                            pdf_part,
                             "이 PDF 문서에 적힌 모든 글자를 분석해서 그대로 텍스트로 추출해줘. 다른 설명이나 인사말은 절대 하지 말고 오직 추출된 텍스트만 보여줘."
                         ]
                     )
@@ -383,7 +388,7 @@ with tab4:
                 except Exception as e:
                     st.error(f"Gemini API 통신 오류: {e}")
                     
-        # 2. 이미지 파일 처리 구문 (기존 로직 유지)
+        # 2. 이미지 파일 처리 구문
         else:
             image = Image.open(uploaded_file)
             st.image(image, caption="업로드된 이미지", use_container_width=True)
