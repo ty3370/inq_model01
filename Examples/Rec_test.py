@@ -351,46 +351,95 @@ with tab3:
 # --- 탭 4: 이미지 및 PDF 텍스트 추출 ---
 with tab4:
     st.subheader("이미지 및 PDF 텍스트 추출")
-    st.info("학생 활동 자료를 이미지나 PDF로 모아두신 선생님들을 위한 탭입니다. 학생 활동지 이미지 파일(PNG, JPG)이나 PDF 파일을 업로드하면 내용을 텍스트로 변환합니다. 텍스트로 변환된 내용을 생기부 생성 탭에서 '학생의 개별 활동 자료'로 입력하시면 됩니다.")
+    st.info(
+        "학생 활동 자료를 이미지나 PDF로 모아두신 선생님들을 위한 탭입니다.\n\n"
+        "* **이미지 파일**: 업로드 즉시 전체 텍스트를 추출합니다.\n"
+        "* **PDF 파일**: 업로드 후 **원하는 페이지를 확인하고 선택하여** 개별적으로 텍스트를 추출할 수 있습니다."
+    )
     
     # 파일 업로더 형식
     uploaded_file = st.file_uploader("텍스트를 추출할 이미지 또는 PDF 파일 업로드", type=["png", "jpg", "jpeg", "pdf"])
     
     if uploaded_file is not None:
         file_type = uploaded_file.type
-        extracted_text = ""
         
-        # 1. PDF 파일 처리 구문 (오류 수정 반영)
+        # 1. PDF 파일 처리 구문 (페이지별 분절 및 선택형 OCR)
         if file_type == "application/pdf":
             st.write(f"📄 업로드된 문서: **{uploaded_file.name}**")
             
-            with st.spinner("문서를 읽어오는 중입니다..."):
+            with st.spinner("PDF 파일을 페이지별로 변환하는 중입니다..."):
                 try:
-                    # PDF 바이너리 읽기
-                    pdf_data = uploaded_file.read()
-                    
-                    # google-genai SDK 규격에 맞는 Part 객체로 생성
-                    pdf_part = types.Part.from_bytes(
-                        data=pdf_data,
-                        mime_type="application/pdf",
-                    )
-                    
-                    # Gemini API 호출
-                    response_gemini = gemini_client.models.generate_content(
-                        model='gemini-2.5-flash',
-                        contents=[
-                            pdf_part,
-                            "이 문서에 적힌 모든 글자를 분석해서 그대로 텍스트로 추출해줘. 다른 설명이나 인사말은 절대 하지 말고 오직 추출된 텍스트만 보여줘."
-                        ]
-                    )
-                    extracted_text = response_gemini.text
-                    st.success("PDF 텍스트 추출 완료!")
+                    from pdf2image import convert_from_bytes
+                    # PDF 바이너리를 이미지 리스트로 변환
+                    pdf_bytes = uploaded_file.read()
+                    pages = convert_from_bytes(pdf_bytes)
+                    st.success(f"총 {len(pages)}개의 페이지를 분석했습니다. 변환할 페이지를 선택하세요.")
                 except Exception as e:
-                    st.error(f"Gemini API 통신 오류: {e}")
+                    st.error(f"PDF 페이지 분할 중 오류가 발생했습니다: {e}")
+                    pages = []
+
+            # 각 페이지를 루프 돌며 화면에 배치
+            for idx, page_image in enumerate(pages):
+                page_num = idx + 1
+                
+                # 가로 구분선과 함께 페이지 넘버링 표시
+                st.markdown(f"---")
+                
+                # Streamlit 컬럼 레이아웃을 활용해 왼쪽은 이미지(썸네일), 오른쪽은 조작 및 결과창 배치
+                col1, col2 = st.columns([1, 2])
+                
+                with col1:
+                    st.markdown(f"**📄 {page_num}번 페이지 예시**")
+                    # 선생님들이 알아볼 수 있게 적당한 크기로 썸네일 표시
+                    st.image(page_image, caption=f"{page_num}쪽", use_container_width=True)
                     
-        # 2. 이미지 파일 처리 구문 (PDF와 동일하게 파일명만 표시하도록 수정)
+                    # unique한 key를 주기 위해 idx 활용
+                    extract_btn = st.button(f"🔍 {page_num}쪽 텍스트 추출하기", key=f"btn_pdf_{idx}")
+                
+                with col2:
+                    # 버튼이 클릭되었을 때만 해당 페이지 OCR 수행
+                    if extract_btn:
+                        with st.spinner(f"{page_num}쪽 글자를 분석하는 중입니다..."):
+                            try:
+                                response_gemini = gemini_client.models.generate_content(
+                                    model='gemini-2.5-flash',
+                                    contents=[
+                                        page_image, 
+                                        "이 이미지에 적힌 모든 글자를 분석해서 그대로 텍스트로 추출해줘. 다른 설명이나 인사말은 절대 하지 말고 오직 추출된 텍스트만 보여줘."
+                                    ]
+                                )
+                                extracted_text = response_gemini.text
+                                
+                                # 결과 출력
+                                st.write(f"**✨ {page_num}쪽 추출 결과:**")
+                                st.info(extracted_text)
+                                
+                                # 복사 버튼 생성
+                                escaped_text = extracted_text.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
+                                st.components.v1.html(f"""
+                                    <button id="copyBtn_pdf_{idx}" onclick="
+                                        navigator.clipboard.writeText(`{escaped_text}`).then(() => {{
+                                            const btn = document.getElementById('copyBtn_pdf_{idx}');
+                                            btn.innerText = '✅ 복사 완료!';
+                                            btn.style.backgroundColor = '#28a745';
+                                            setTimeout(() => {{
+                                                btn.innerText = '{page_num}쪽 텍스트 복사';
+                                                btn.style.backgroundColor = '#FF4B4B';
+                                            }}, 1500);
+                                        }})
+                                    " 
+                                    style="background-color: #FF4B4B; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
+                                    {page_num}쪽 텍스트 복사하기
+                                    </button>
+                                """, height=45)
+                                
+                            except Exception as e:
+                                st.error(f"Gemini API 통신 오류: {e}")
+
+        # 2. 일반 이미지 파일 처리 구문
         else:
             st.write(f"📄 업로드된 문서: **{uploaded_file.name}**")
+            extracted_text = ""
             
             with st.spinner("문서를 읽어오는 중입니다..."):
                 try:
@@ -406,27 +455,25 @@ with tab4:
                     st.success("이미지 텍스트 추출 완료!")
                 except Exception as e:
                     st.error(f"Gemini API 통신 오류: {e}")
-        
-        # 3. 결과 표시 및 복사 기능 (공통 구문 - 타 탭과 양식 통일)
-        if extracted_text:
-            st.write("**텍스트 추출 결과:**")
-            st.info(extracted_text)
             
-            # 자바스크립트 내 문자열 깨짐 방지 처리
-            escaped_text = extracted_text.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
-            st.components.v1.html(f"""
-                <button id="copyBtnOCR" onclick="
-                    navigator.clipboard.writeText(`{escaped_text}`).then(() => {{
-                        const btn = document.getElementById('copyBtnOCR');
-                        btn.innerText = '✅ 복사 완료!';
-                        btn.style.backgroundColor = '#28a745';
-                        setTimeout(() => {{
-                            btn.innerText = '추출된 텍스트 복사하기';
-                            btn.style.backgroundColor = '#FF4B4B';
-                        }}, 1500);
-                    }})
-                " 
-                style="background-color: #FF4B4B; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
-                추출된 텍스트 복사하기
-                </button>
-            """, height=45)
+            if extracted_text:
+                st.write("**텍스트 추출 결과:**")
+                st.info(extracted_text)
+                
+                escaped_text = extracted_text.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
+                st.components.v1.html(f"""
+                    <button id="copyBtnOCR" onclick="
+                        navigator.clipboard.writeText(`{escaped_text}`).then(() => {{
+                            const btn = document.getElementById('copyBtnOCR');
+                            btn.innerText = '✅ 복사 완료!';
+                            btn.style.backgroundColor = '#28a745';
+                            setTimeout(() => {{
+                                btn.innerText = '추출된 텍스트 복사하기';
+                                btn.style.backgroundColor = '#FF4B4B';
+                            }}, 1500);
+                        }})
+                    " 
+                    style="background-color: #FF4B4B; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
+                    추출된 텍스트 복사하기
+                    </button>
+                """, height=45)
