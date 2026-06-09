@@ -389,8 +389,7 @@ with tab4:
                 col1, col2 = st.columns([1, 2])
                 
                 with col1:
-                    st.markdown(f"**📄 {page_num}번 페이지 예시**")
-                    # 선생님들이 알아볼 수 있게 적당한 크기로 썸네일 표시
+                    st.markdown(f"**📄 {page_num}번 페이지**")
                     st.image(page_image, caption=f"{page_num}쪽", use_container_width=True)
                     
                     # unique한 key를 주기 위해 idx 활용
