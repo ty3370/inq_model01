@@ -1,0 +1,223 @@
+import streamlit as st
+import os
+from dotenv import load_dotenv
+from google import genai
+from google.genai import types
+from PIL import Image
+
+# 환경 변수 로드 및 초기화
+load_dotenv()
+GOOGLE_API_KEY = st.secrets.get("GOOGLE_API_KEY", os.getenv("GOOGLE_API_KEY"))
+gemini_client = genai.Client(api_key=GOOGLE_API_KEY)
+
+# Streamlit 앱 UI 설정
+st.set_page_config(
+    page_title="서술형 평가 자동 채점 시스템",
+    page_icon="📝",
+    layout="wide"
+)
+
+# --- 상단 타이틀 및 인용구 (고정 배치) ---
+st.markdown(
+    """
+    <h1 style="text-align: center;">서술형 평가 자동 채점 시스템</h1>
+    """, 
+    unsafe_allow_html=True
+)
+
+st.markdown(
+    """
+    <div style="text-align: center;">
+        <blockquote style="font-size: 16px; border: none; display: inline-block; padding: 10px 20px; background-color: transparent; margin: 0;">
+            💫 <strong>“많은 사람을 옳은 데로 돌아오게 한 자는 별과 같이 영원토록 빛나리라”</strong> — 다니엘 12장 3절
+        </blockquote>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+st.markdown("---")
+
+# --- 세션 상태(Session State) 초기화 ---
+if "system_prompt" not in st.session_state:
+    st.session_state["system_prompt"] = ""
+if "grading_criteria" not in st.session_state:
+    st.session_state["grading_criteria"] = {
+        "max_score": 20,
+        "base_score": 8,
+        "score_step": 1,
+        "pages_per_student": 2,
+        "criteria_text": "",
+        "exception_text": ""
+    }
+if "pdf_pages" not in st.session_state:
+    st.session_state["pdf_pages"] = []
+if "grading_results" not in st.session_state:
+    st.session_state["grading_results"] = {}
+
+# --- 왼쪽/오른쪽 2개 탭 구성 ---
+tab_left, tab_right = st.tabs(["⚙️ 채점 기준 설정", "🔎 답안지 업로드 및 채점"])
+
+# --- [왼쪽 탭] 채점 기준 설정 ---
+
+with tab_left:
+    st.subheader("📋 기본 점수 및 채점 가이드 설정")
+    st.info("채점 기준과 감점 규정, 채점 중 발견된 예외 항목들을 관리하는 공간입니다.")
+    
+    with st.form(key="config_form"):
+        col_a, col_b, col_c, col_d = st.columns(4)
+        with col_a:
+            max_score = st.number_input("만점 [숫자만 입력]", value=st.session_state["grading_criteria"]["max_score"], step=1)
+        with col_b:
+            base_score = st.number_input("기본 점수 [숫자만 입력]", value=st.session_state["grading_criteria"]["base_score"], step=1)
+        with col_c:
+            score_step = st.number_input("점수 급간 [숫자만 입력]", value=st.session_state["grading_criteria"]["score_step"], step=1)
+        with col_d:
+            pages_per_student = st.number_input("학생 1인당 답안지 수 [숫자만 입력]", value=st.session_state["grading_criteria"]["pages_per_student"], step=1, min_value=1)
+
+        criteria_text = st.text_area("📄 채점 기준", value=st.session_state["grading_criteria"]["criteria_text"], height=150, placeholder="예: 1항목 - 핵심 키워드 '광합성' 포함 시 5점 부여...")
+        
+        exception_text = st.text_area("💡 정답 인정 또는 오답 처리 항목 (예외 기준)", value=st.session_state["grading_criteria"]["exception_text"], height=150, placeholder="예: '빛합성'이라는 오탈자는 문맥상 맞으므로 감점 없음.")
+
+        submit_config = st.form_submit_button("🔄 기준 업데이트")
+
+        if submit_config:
+            # 데이터 동기화
+            st.session_state["grading_criteria"].update({
+                "max_score": max_score,
+                "base_score": base_score,
+                "score_step": score_step,
+                "pages_per_student": pages_per_student,
+                "criteria_text": criteria_text,
+                "exception_text": exception_text
+            })
+            
+            # 초기 시스템 프롬프트 작성 (수정 시 기존 프롬프트는 삭제되고 덮어씌워짐)
+            st.session_state["system_prompt"] = (
+                f"당신은 엄격하고 공정한 채점관입니다. 제시된 채점 기준과 예외 항목을 바탕으로 학생의 서술형 답안을 채점하세요.\n\n"
+                f"[점수 규칙]\n"
+                f"- 만점: {max_score}점 / 기본 점수: {base_score}점\n"
+                f"- 점수 감점 및 부여는 반드시 급간 단위({score_step}점)로만 수행하세요.\n\n"
+                f"[채점 기준]\n{criteria_text}\n\n"
+                f"[정답 인정 또는 오답 처리 항목 (예외 기준)]\n{exception_text}\n\n"
+                f"[출력 양식]\n"
+                f"반드시 다음 3가지 항목 양식에 맞춰 응답하세요. 다른 인사말이나 불필요한 텍스트는 절대 생략합니다.\n"
+                f"1. 채점 항목별 채점 결과와 세부 근거:\n"
+                f"2. 총점: (기본점수와 감점 요인을 계산한 최종 점수)\n"
+                f"3. 학생에게 제공할 피드백:"
+            )
+            st.success("✅ 채점 기준 프롬프트가 최신 상태로 생성/수정되었습니다!")
+
+# --- 파일 업로드 및 채점 ---
+
+with tab_right:
+    st.subheader("📂 학생 답안지 채점 진행")
+    
+    # 설정이 먼저 완료되었는지 검증
+    if not st.session_state["system_prompt"]:
+        st.warning("⚠️ 먼저 왼쪽의 '⚙️ 채점 기준 설정' 탭에서 [업데이트] 버튼을 눌러 초기 설정을 진행해 주세요.")
+    
+    uploaded_file = st.file_uploader("학생들의 답안지 PDF 파일을 업로드하세요.", type=["pdf"])
+
+    # 파일이 새로 업로드되면 기존 페이지 변환 기록 초기화
+    if uploaded_file is not None:
+        if "last_uploaded_filename" not in st.session_state or st.session_state["last_uploaded_filename"] != uploaded_file.name:
+            st.session_state["pdf_pages"] = []
+            st.session_state["grading_results"] = {}
+            st.session_state["last_uploaded_filename"] = uploaded_file.name
+
+        # PDF 변환 로직
+        if not st.session_state["pdf_pages"]:
+            with st.spinner("PDF 파일을 페이지별 이미지로 변환하고 있습니다..."):
+                try:
+                    from pdf2image import convert_from_bytes
+                    pdf_bytes = uploaded_file.read()
+                    st.session_state["pdf_pages"] = convert_from_bytes(pdf_bytes)
+                except Exception as e:
+                    st.error(f"PDF 변환 실패: {e}. 시스템에 'pdf2image'와 'poppler'가 구성되어 있는지 확인하세요.")
+
+        pages = st.session_state["pdf_pages"]
+        p_per_student = st.session_state["grading_criteria"]["pages_per_student"]
+        
+        if pages:
+            total_students = (len(pages) + p_per_student - 1) // p_per_student
+            st.info(f"📊 총 {len(pages)}쪽 분석 완료 ➡️ 학생 1인당 {p_per_student}장씩 묶어 총 {total_students}명의 학생 답안지를 배치했습니다.")
+
+            # 학생 단위 루프 생성
+            for s_idx in range(total_students):
+                student_num = s_idx + 1
+                st.markdown(f"### 👤 학생 {student_num} 답안지")
+                
+                # 해당 학생이 제출한 페이지 슬라이싱 (실제 파일 합치기X, 개별 이미지 OCR)
+                start_page = s_idx * p_per_student
+                end_page = min(start_page + p_per_student, len(pages))
+                student_pages = pages[start_page:end_page]
+                
+                # 사용자가 입력한 장수(pages_per_student)만큼 가로 그리드로 배치
+                img_cols = st.columns(p_per_student)
+                for i, page_img in enumerate(student_pages):
+                    with img_cols[i]:
+                        st.image(page_img, caption=f"학생 {student_num} - {i+1}번 페이지", use_container_width=True)
+
+                # 결과 레이아웃: 왼쪽(채점 결과) / 오른쪽(실시간 예외 기준 추가창)
+                res_col, side_col = st.columns([2, 1])
+                
+                with res_col:
+                    start_grading = st.button(f"🔍 학생 {student_num} 채점 시작", key=f"btn_grade_{student_num}")
+                    
+                    if start_grading:
+                        with st.spinner(f"학생 {student_num}의 답안 분석 중..."):
+                            try:
+                                # 멀티모달 프롬프트 빌드 (이미지 배열 + 텍스트 가이드)
+                                contents_payload = list(student_pages)
+                                contents_payload.append(
+                                    f"{st.session_state['system_prompt']}\n\n위 이미지 파일들은 학생 {student_num}의 서술형 답안지입니다. 기준에 맞게 채점하세요."
+                                )
+                                
+                                response = gemini_client.models.generate_content(
+                                    model='gemini-2.5-flash',
+                                    contents=contents_payload
+                                )
+                                st.session_state["grading_results"][student_num] = response.text
+                            except Exception as e:
+                                st.error(f"Gemini API 통신 오류: {e}")
+
+                    # 채점 결과 렌더링
+                    if student_num in st.session_state["grading_results"]:
+                        st.write(f"**✨ 학생 {student_num} 채점 결과**")
+                        st.info(st.session_state["grading_results"][student_num])
+                
+                with side_col:
+                    # 채점 과정 중 실시간 기준 추가 기능
+                    if student_num in st.session_state["grading_results"]:
+                        st.write("💡 **실시간 예외 기준 추가**")
+                        new_rule = st.text_input(
+                            "새로운 정답 인정/오답 처리 규칙 입력:", 
+                            placeholder="예: 'CO2' 기호 표기도 정답 인정함",
+                            key=f"new_rule_{student_num}"
+                        )
+                        update_rule_btn = st.button("➕ 기준 추가 및 업데이트", key=f"btn_add_{student_num}")
+                        
+                        if update_rule_btn and new_rule:
+                            # 1. 왼쪽 탭 데이터 업데이트
+                            current_exceptions = st.session_state["grading_criteria"]["exception_text"]
+                            updated_exceptions = (current_exceptions + f"\n- {new_rule}").strip()
+                            st.session_state["grading_criteria"]["exception_text"] = updated_exceptions
+                            
+                            # 2. 내부 시스템 프롬프트 자동 동기화
+                            st.session_state["system_prompt"] = (
+                                f"당신은 엄격하고 공정한 채점관입니다. 제시된 채점 기준과 예외 항목을 바탕으로 학생의 서술형 답안을 채점하세요.\n\n"
+                                f"[점수 규칙]\n"
+                                f"- 만점: {st.session_state['grading_criteria']['max_score']}점 / 기본 점수: {st.session_state['grading_criteria']['base_score']}점\n"
+                                f"- 점수 감점 및 부여는 반드시 급간 단위({st.session_state['grading_criteria']['score_step']}점)로만 수행하세요.\n\n"
+                                f"[채점 기준]\n{st.session_state['grading_criteria']['criteria_text']}\n\n"
+                                f"[정답 인정 또는 오답 처리 항목 (예외 기준)]\n{updated_exceptions}\n\n"
+                                f"[출력 양식]\n"
+                                f"반드시 다음 3가지 항목 양식에 맞춰 응답하세요. 다른 인사말은 생략합니다.\n"
+                                f"1. 채점 항목별 채점 결과와 세부 근거:\n"
+                                f"2. 총점:\n"
+                                f"3. 학생에게 제공할 피드백:"
+                            )
+                            st.success("왼쪽 탭의 예외 기준과 초기 프롬프트에 동적 반영되었습니다! 다음 채점 학생부터 바로 적용됩니다.")
+                            st.rerun() # UI 리프레시용
+                st.markdown("---")
