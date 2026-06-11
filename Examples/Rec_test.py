@@ -357,6 +357,10 @@ with tab4:
         "* **PDF 파일**: 업로드 후 원하는 페이지를 확인하고 선택하여 개별적으로 텍스트를 추출할 수 있습니다."
     )
     
+    # 💡 세션 상태에 PDF 추출 결과를 저장할 딕셔너리 초기화
+    if "pdf_extracted_texts" not in st.session_state:
+        st.session_state["pdf_extracted_texts"] = {}
+    
     # 파일 업로더 형식
     uploaded_file = st.file_uploader("텍스트를 추출할 이미지 또는 PDF 파일 업로드", type=["png", "jpg", "jpeg", "pdf"])
     
@@ -396,7 +400,7 @@ with tab4:
                     extract_btn = st.button(f"🔍 {page_num}쪽 텍스트 추출하기", key=f"btn_pdf_{idx}")
                 
                 with col2:
-                    # 버튼이 클릭되었을 때만 해당 페이지 OCR 수행
+                    # 버튼이 클릭되었을 때 세션 상태에 결과 저장
                     if extract_btn:
                         with st.spinner(f"{page_num}쪽 글자를 분석하는 중입니다..."):
                             try:
@@ -407,36 +411,41 @@ with tab4:
                                         "이 이미지에 적힌 모든 글자를 분석해서 그대로 텍스트로 추출해줘. 다른 설명이나 인사말은 절대 하지 말고 오직 추출된 텍스트만 보여줘."
                                     ]
                                 )
-                                extracted_text = response_gemini.text
-                                
-                                # 결과 출력
-                                st.write(f"**✨ {page_num}쪽 추출 결과:**")
-                                st.info(extracted_text)
-                                
-                                # 복사 버튼 생성
-                                escaped_text = extracted_text.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
-                                st.components.v1.html(f"""
-                                    <button id="copyBtn_pdf_{idx}" onclick="
-                                        navigator.clipboard.writeText(`{escaped_text}`).then(() => {{
-                                            const btn = document.getElementById('copyBtn_pdf_{idx}');
-                                            btn.innerText = '✅ 복사 완료!';
-                                            btn.style.backgroundColor = '#28a745';
-                                            setTimeout(() => {{
-                                                btn.innerText = '{page_num}쪽 텍스트 복사';
-                                                btn.style.backgroundColor = '#FF4B4B';
-                                            }}, 1500);
-                                        }})
-                                    " 
-                                    style="background-color: #FF4B4B; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
-                                    {page_num}쪽 텍스트 복사하기
-                                    </button>
-                                """, height=45)
-                                
+                                # 💡 추출 결과를 세션 상태에 페이지 번호를 키값으로 저장합니다.
+                                st.session_state["pdf_extracted_texts"][page_num] = response_gemini.text
                             except Exception as e:
                                 st.error(f"Gemini API 통신 오류: {e}")
+                    
+                    # 💡 세션 상태에 해당 페이지의 추출 결과가 존재한다면 화면에 항상 그려줍니다.
+                    if page_num in st.session_state["pdf_extracted_texts"]:
+                        extracted_text = st.session_state["pdf_extracted_texts"][page_num]
+                        
+                        # 결과 출력
+                        st.write(f"**✨ {page_num}쪽 추출 결과:**")
+                        st.info(extracted_text)
+                        
+                        # 복사 버튼 생성
+                        escaped_text = extracted_text.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
+                        st.components.v1.html(f"""
+                            <button id="copyBtn_pdf_{idx}" onclick="
+                                navigator.clipboard.writeText(`{escaped_text}`).then(() => {{
+                                    const btn = document.getElementById('copyBtn_pdf_{idx}');
+                                    btn.innerText = '✅ 복사 완료!';
+                                    btn.style.backgroundColor = '#28a745';
+                                    setTimeout(() => {{
+                                        btn.innerText = '{page_num}쪽 텍스트 복사';
+                                        btn.style.backgroundColor = '#FF4B4B';
+                                    }}, 1500);
+                                }})
+                            " 
+                            style="background-color: #FF4B4B; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
+                            {page_num}쪽 텍스트 복사하기
+                            </button>
+                        """, height=45)
 
         # 2. 일반 이미지 파일 처리 구문
         else:
+            # (기존 이미지 처리 코드는 그대로 유지하시면 됩니다)
             st.write(f"📄 업로드된 문서: **{uploaded_file.name}**")
             extracted_text = ""
             
