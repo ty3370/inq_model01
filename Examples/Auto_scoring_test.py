@@ -15,7 +15,7 @@ MODEL_NAME = "gpt-5.5"
 
 # Streamlit 앱 UI 설정
 st.set_page_config(
-    page_title="서술형 평가 자동 채점 시스템 [GPT]",
+    page_title="서술형 평가 자동 채점 시스템",
     page_icon="📝",
     layout="wide"
 )
@@ -23,7 +23,7 @@ st.set_page_config(
 # --- 상단 타이틀 및 인용구 (고정 배치) ---
 st.markdown(
     """
-    <h1 style="text-align: center;">서술형 평가 자동 채점 시스템</h1>
+    <h1 style="text-align: center;">서술형 평가 자동 채점 시스템 [GPT]</h1>
     """, 
     unsafe_allow_html=True
 )
