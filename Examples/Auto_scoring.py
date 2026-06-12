@@ -147,7 +147,9 @@ with tab_right:
             st.info(f"총 {len(pages)}쪽 분석 완료 ➡️ 학생 1인당 {p_per_student}장씩 묶어 총 {total_students}명의 학생 답안지를 배치했습니다.")
 
             # --- 모든 학생 일괄 채점 시작 버튼 ---
-            start_bulk_grading = st.button("🚀 모든 학생 일괄 채점 시작", key="btn_bulk_grade", type="primary")
+#            start_bulk_grading = st.button("🔍 모든 학생 일괄 채점 시작", key="btn_bulk_grade", type="primary")
+
+            start_bulk_grading = False # 일괄 채점 활성화 시 이 문장을 주석처리
             
             if start_bulk_grading:
                 bulk_progress = st.progress(0)
