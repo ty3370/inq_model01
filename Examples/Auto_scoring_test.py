@@ -11,7 +11,7 @@ from PIL import Image
 load_dotenv()
 OPENAI_API_KEY = st.secrets.get("OPENAI_API_KEY", os.getenv("OPENAI_API_KEY"))
 openai_client = OpenAI(api_key=OPENAI_API_KEY)
-MODEL_NAME = "gpt-5.4-mini"
+MODEL_NAME = "gpt-5.5"
 
 # Streamlit 앱 UI 설정
 st.set_page_config(

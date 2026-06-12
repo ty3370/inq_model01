@@ -12,7 +12,7 @@ from PIL import Image
 load_dotenv()
 GOOGLE_API_KEY = st.secrets.get("GOOGLE_API_KEY", os.getenv("GOOGLE_API_KEY"))
 gemini_client = genai.Client(api_key=GOOGLE_API_KEY)
-MODEL_NAME = "gemini-2.5-flash"
+MODEL_NAME = "gemini-2.5-pro"
 
 # Streamlit 앱 UI 설정
 st.set_page_config(
