@@ -1,8 +1,8 @@
 import streamlit as st
 import os
 import time
-import pandas as pd  # 엑셀 변환을 위해 추가
-import io             # 메모리 버퍼 활용을 위해 추가
+import pandas as pd
+import io
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
@@ -249,6 +249,7 @@ with tab_right:
                                     contents=contents_payload
                                 )
                                 st.session_state["grading_results"][student_num] = response.text
+                                st.rerun()
                             except Exception as e:
                                 st.error(f"Gemini API 통신 오류: {e}")
 
