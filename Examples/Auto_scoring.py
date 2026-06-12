@@ -1,6 +1,8 @@
 import streamlit as st
 import os
 import time
+import pandas as pd  # 엑셀 변환을 위해 추가
+import io             # 메모리 버퍼 활용을 위해 추가
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
@@ -142,9 +144,10 @@ with tab_right:
         
         if pages:
             total_students = (len(pages) + p_per_student - 1) // p_per_student
-            st.info(f"총 {len(pages)}쪽 분석 완료 : 학생 1인당 {p_per_student}장씩 묶어 총 {total_students}명의 학생 답안지를 배치했습니다.")
+            st.info(f"총 {len(pages)}쪽 분석 완료 ➡️ 학생 1인당 {p_per_student}장씩 묶어 총 {total_students}명의 학생 답안지를 배치했습니다.")
 
-            start_bulk_grading = st.button("🔍 모든 학생 일괄 채점 시작", key="btn_bulk_grade", type="primary")
+            # --- 모든 학생 일괄 채점 시작 버튼 ---
+            start_bulk_grading = st.button("🚀 모든 학생 일괄 채점 시작", key="btn_bulk_grade", type="primary")
             
             if start_bulk_grading:
                 bulk_progress = st.progress(0)
@@ -172,10 +175,37 @@ with tab_right:
                         
                         # 진행 바 업데이트
                         bulk_progress.progress((s_idx + 1) / total_students)
-                st.success("모든 학생의 일괄 채점이 완료되었습니다!")
+                st.success("🎉 모든 학생의 일괄 채점이 완료되었습니다!")
                 st.rerun()
 
             st.markdown("---")
+
+            # --- 채점 결과 엑셀 다운로드 구역 ---
+            if st.session_state["grading_results"]:
+                st.subheader("📊 채점 결과 내보내기")
+                
+                excel_data = []
+                for student_num, result_text in st.session_state["grading_results"].items():
+                    excel_data.append({
+                        "학생 번호": f"학생 {student_num}",
+                        "채점 결과 상세 및 피드백": result_text
+                    })
+                
+                df = pd.DataFrame(excel_data)
+                
+                buffer = io.BytesIO()
+                with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+                    df.to_excel(writer, index=False, sheet_name='채점결과')
+                buffer.seek(0)
+                
+                st.download_button(
+                    label="📥 전체 채점 결과 Excel 다운로드",
+                    data=buffer,
+                    file_name="서술형_채점_결과.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    type="secondary"
+                )
+                st.markdown("---")
 
             # 학생 단위 루프 생성
             for s_idx in range(total_students):
@@ -189,7 +219,7 @@ with tab_right:
                 img_cols = st.columns(p_per_student)
                 for i, page_img in enumerate(student_pages):
                     with img_cols[i]:
-                        st.image(page_img, caption=f"학생 {student_num} - {i+1}번 페이지", use_container_width=True)
+                        st.image(page_img, caption=f"학생 {student_num} - {i+1}번 페이지", width=300) # 이미지 크기
 
                 # 결과 레이아웃: 왼쪽(채점 결과) / 오른쪽(실시간 예외 기준 추가창)
                 res_col, side_col = st.columns([2, 1])
@@ -249,11 +279,10 @@ with tab_right:
                                     f"2. 총점:\n"
                                     f"3. 학생에게 제공할 피드백:"
                                 )
-                                # 가상의 작업 시간 부여 및 완료 안내 메시지 노출
                                 time.sleep(0.5)
                                 msg_placeholder = st.empty()
-                                msg_placeholder.success("기준 업데이트 완료! 다음 채점부터 바로 적용됩니다.")
-                                time.sleep(1.2)  # 유저가 메시지를 읽을 수 있도록 대기
+                                msg_placeholder.success("🎯 기준 업데이트 완료! 다음 채점부터 바로 적용됩니다.")
+                                time.sleep(1.2)
                                 msg_placeholder.empty()
                                 
                             st.rerun() # UI 리프레시
