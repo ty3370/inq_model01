@@ -46,7 +46,7 @@ if "grading_criteria" not in st.session_state:
         "max_score": 20,
         "base_score": 8,
         "score_step": 1,
-        "pages_per_student": 2,
+        "pages_per_student": 1,
         "criteria_text": "",
         "exception_text": ""
     }
@@ -56,28 +56,28 @@ if "grading_results" not in st.session_state:
     st.session_state["grading_results"] = {}
 
 # --- 왼쪽/오른쪽 2개 탭 구성 ---
-tab_left, tab_right = st.tabs(["⚙️ 채점 기준 설정", "🔎 답안지 업로드 및 채점"])
+tab_left, tab_right = st.tabs(["⚙️ 채점 기준 설정", "🔎 학생 답안지 업로드 및 채점"])
 
 # --- [왼쪽 탭] 채점 기준 설정 ---
 
 with tab_left:
-    st.subheader("📋 기본 점수 및 채점 가이드 설정")
+    st.subheader("📋 채점 기준 설정")
     st.info("채점 기준과 감점 규정, 채점 중 발견된 예외 항목들을 관리하는 공간입니다.")
     
     with st.form(key="config_form"):
         col_a, col_b, col_c, col_d = st.columns(4)
         with col_a:
-            max_score = st.number_input("만점 [숫자만 입력]", value=st.session_state["grading_criteria"]["max_score"], step=1)
+            max_score = st.number_input("만점", value=st.session_state["grading_criteria"]["max_score"], step=1)
         with col_b:
-            base_score = st.number_input("기본 점수 [숫자만 입력]", value=st.session_state["grading_criteria"]["base_score"], step=1)
+            base_score = st.number_input("기본 점수", value=st.session_state["grading_criteria"]["base_score"], step=1)
         with col_c:
-            score_step = st.number_input("점수 급간 [숫자만 입력]", value=st.session_state["grading_criteria"]["score_step"], step=1)
+            score_step = st.number_input("점수 급간", value=st.session_state["grading_criteria"]["score_step"], step=1)
         with col_d:
-            pages_per_student = st.number_input("학생 1인당 답안지 수 [숫자만 입력]", value=st.session_state["grading_criteria"]["pages_per_student"], step=1, min_value=1)
+            pages_per_student = st.number_input("학생 1인당 답안지 수", value=st.session_state["grading_criteria"]["pages_per_student"], step=1, min_value=1)
 
-        criteria_text = st.text_area("📄 채점 기준", value=st.session_state["grading_criteria"]["criteria_text"], height=150, placeholder="예: 1항목 - 핵심 키워드 '광합성' 포함 시 5점 부여...")
+        criteria_text = st.text_area("채점 기준", value=st.session_state["grading_criteria"]["criteria_text"], height=150, placeholder="예: 1번 문제의 A=34.3 (1점), B=441 (1점)")
         
-        exception_text = st.text_area("💡 정답 인정 또는 오답 처리 항목 (예외 기준)", value=st.session_state["grading_criteria"]["exception_text"], height=150, placeholder="예: '빛합성'이라는 오탈자는 문맥상 맞으므로 감점 없음.")
+        exception_text = st.text_area("정답 인정 또는 오답 처리 항목 (예외 기준)", value=st.session_state["grading_criteria"]["exception_text"], height=150, placeholder="예: 1번 문제의 B를 분수로 써도 정답 인정")
 
         submit_config = st.form_submit_button("🔄 기준 업데이트")
 
@@ -141,12 +141,12 @@ with tab_right:
         
         if pages:
             total_students = (len(pages) + p_per_student - 1) // p_per_student
-            st.info(f"📊 총 {len(pages)}쪽 분석 완료 ➡️ 학생 1인당 {p_per_student}장씩 묶어 총 {total_students}명의 학생 답안지를 배치했습니다.")
+            st.info(f"총 {len(pages)}쪽 분석 완료 ➡️ 학생 1인당 {p_per_student}장씩 묶어 총 {total_students}명의 학생 답안지를 배치했습니다.")
 
             # 학생 단위 루프 생성
             for s_idx in range(total_students):
                 student_num = s_idx + 1
-                st.markdown(f"### 👤 학생 {student_num} 답안지")
+                st.markdown(f"### 학생 {student_num} 답안지")
                 
                 # 해당 학생이 제출한 페이지 슬라이싱 (실제 파일 합치기X, 개별 이미지 OCR)
                 start_page = s_idx * p_per_student
@@ -184,13 +184,13 @@ with tab_right:
 
                     # 채점 결과 렌더링
                     if student_num in st.session_state["grading_results"]:
-                        st.write(f"**✨ 학생 {student_num} 채점 결과**")
+                        st.write(f"**학생 {student_num} 채점 결과**")
                         st.info(st.session_state["grading_results"][student_num])
                 
                 with side_col:
                     # 채점 과정 중 실시간 기준 추가 기능
                     if student_num in st.session_state["grading_results"]:
-                        st.write("💡 **실시간 예외 기준 추가**")
+                        st.write("➕ **정답 인정/오답 처리 항목 추가**")
                         new_rule = st.text_input(
                             "새로운 정답 인정/오답 처리 규칙 입력:", 
                             placeholder="예: 'CO2' 기호 표기도 정답 인정함",
