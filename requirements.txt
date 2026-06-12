@@ -5,3 +5,5 @@ openai
 google-genai
 pillow
 pdf2image
+pandas
+openpyxl
