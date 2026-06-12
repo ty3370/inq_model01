@@ -219,7 +219,7 @@ with tab_right:
                 img_cols = st.columns(p_per_student)
                 for i, page_img in enumerate(student_pages):
                     with img_cols[i]:
-                        st.image(page_img, caption=f"학생 {student_num} - {i+1}번 페이지", width=300) # 이미지 크기
+                        st.image(page_img, caption=f"학생 {student_num} - {i+1}번 페이지", width=700) # 이미지 크기
 
                 # 결과 레이아웃: 왼쪽(채점 결과) / 오른쪽(실시간 예외 기준 추가창)
                 res_col, side_col = st.columns([2, 1])
