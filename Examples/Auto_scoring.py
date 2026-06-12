@@ -183,31 +183,38 @@ with tab_right:
             st.markdown("---")
 
             # --- 채점 결과 엑셀 다운로드 구역 ---
-            if st.session_state["grading_results"]:
-                st.subheader("📊 채점 결과 내보내기")
+            st.subheader("📊 채점 결과 내보내기")
+            
+            excel_data = []
+            
+            # 전체 학생 목록을 기준으로 엑셀 행을 미리 생성합니다.
+            for s_idx in range(total_students):
+                student_num = s_idx + 1
+                # 해당 학생의 채점 결과가 있으면 가져오고, 없으면 빈 문자열("") 처리를 합니다.
+                result_text = st.session_state["grading_results"].get(student_num, "")
                 
-                excel_data = []
-                for student_num, result_text in st.session_state["grading_results"].items():
-                    excel_data.append({
-                        "학생 번호": f"학생 {student_num}",
-                        "채점 결과 상세 및 피드백": result_text
-                    })
-                
-                df = pd.DataFrame(excel_data)
-                
-                buffer = io.BytesIO()
-                with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
-                    df.to_excel(writer, index=False, sheet_name='채점결과')
-                buffer.seek(0)
-                
-                st.download_button(
-                    label="📥 전체 채점 결과 Excel 다운로드",
-                    data=buffer,
-                    file_name="서술형_채점_결과.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    type="secondary"
-                )
-                st.markdown("---")
+                excel_data.append({
+                    "학생 번호": f"학생 {student_num}",
+                    "채점 결과 상세 및 피드백": result_text
+                })
+            
+            df = pd.DataFrame(excel_data)
+            
+            buffer = io.BytesIO()
+            with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+                df.to_excel(writer, index=False, sheet_name='채점결과')
+            buffer.seek(0)
+            
+            # key 값을 지정해 주어야 다운로드 시 세션이 꼬이거나 풀리는 것을 방지할 수 있습니다.
+            st.download_button(
+                label="📥 전체 채점 결과 Excel 다운로드",
+                data=buffer,
+                file_name="서술형_채점_결과.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                type="secondary",
+                key="btn_excel_download"  # <-- 이 부분 추가
+            )
+            st.markdown("---")
 
             # 학생 단위 루프 생성
             for s_idx in range(total_students):
