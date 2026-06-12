@@ -12,6 +12,7 @@ from PIL import Image
 load_dotenv()
 GOOGLE_API_KEY = st.secrets.get("GOOGLE_API_KEY", os.getenv("GOOGLE_API_KEY"))
 gemini_client = genai.Client(api_key=GOOGLE_API_KEY)
+MODEL_NAME = "gemini-2.5-pro"  # 사용할 모델 지정
 
 # Streamlit 앱 UI 설정
 st.set_page_config(
@@ -168,7 +169,7 @@ with tab_right:
                             )
                             
                             response = gemini_client.models.generate_content(
-                                model='gemini-2.5-flash',
+                                model=MODEL_NAME,
                                 contents=contents_payload
                             )
                             st.session_state["grading_results"][student_num] = response.text
@@ -245,7 +246,7 @@ with tab_right:
                                 )
                                 
                                 response = gemini_client.models.generate_content(
-                                    model='gemini-2.5-flash',
+                                    model=MODEL_NAME,
                                     contents=contents_payload
                                 )
                                 st.session_state["grading_results"][student_num] = response.text
