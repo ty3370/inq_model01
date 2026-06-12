@@ -97,7 +97,7 @@ with tab_left:
             
             # 초기 시스템 프롬프트 작성
             st.session_state["system_prompt"] = (
-                f"당신은 엄격하고 공정한 채점관입니다. 제시된 채점 기준과 예외 항목을 바탕으로 학생의 서술형 답안을 채점하세요.\n\n"
+                f"당신은 엄격하고 공정한 채점관입니다. 제시된 채점 기준과 예외 항목을 바탕으로 학생의 서술형 답안을 채점하세요. 마크다운을 사용하지 말고, 줄바꿈을 사용해 가독성을 높이세요.\n\n"
                 f"[점수 규칙]\n"
                 f"- 만점: {max_score}점 / 기본 점수: {base_score}점\n"
                 f"- 점수 감점 및 부여는 반드시 급간 단위({score_step}점)로만 수행하세요.\n\n"
@@ -267,7 +267,7 @@ with tab_right:
                                 
                                 # 2. 내부 시스템 프롬프트 자동 동기화
                                 st.session_state["system_prompt"] = (
-                                    f"당신은 엄격하고 공정한 채점관입니다. 제시된 채점 기준과 예외 항목을 바탕으로 학생의 서술형 답안을 채점하세요.\n\n"
+                                    f"당신은 엄격하고 공정한 채점관입니다. 제시된 채점 기준과 예외 항목을 바탕으로 학생의 서술형 답안을 채점하세요. 마크다운을 사용하지 말고, 줄바꿈을 사용해 가독성을 높이세요.\n\n"
                                     f"[점수 규칙]\n"
                                     f"- 만점: {st.session_state['grading_criteria']['max_score']}점 / 기본 점수: {st.session_state['grading_criteria']['base_score']}점\n"
                                     f"- 점수 감점 및 부여는 반드시 급간 단위({st.session_state['grading_criteria']['score_step']}점)로만 수행하세요.\n\n"
