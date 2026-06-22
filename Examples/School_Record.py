@@ -6,21 +6,13 @@ from google import genai
 from google.genai import types
 from PIL import Image
 
-# 환경 변수 로드
 load_dotenv()
-
-# API 키 및 모델 설정
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
 MODEL = 'gpt-4o'
-
-# 요청하신 명칭으로 제미나이 API 키 설정
 GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
-
-# API 클라이언트 초기화
 client = OpenAI(api_key=OPENAI_API_KEY)
 gemini_client = genai.Client(api_key=GOOGLE_API_KEY)
 
-# 초기 프롬프트 설정
 initial_prompt = (
     "당신은 고등학교 교사로, 학생들의 특성과 활동에 기반해 생활기록부를 작성해주어야 합니다."
     "생활기록부 작성하는 말투는 -임. -함. 등으로 작성하세요."
@@ -74,7 +66,6 @@ initial_prompt = (
     "최대한 풍성하게 써야 합니다. (가능하면 10줄 이상)"
 )
 
-# 창체 추가 프롬프트
 activity_prompt = (
     "당신은 생기부 자율활동 내용을 생성하는 ai입니다. 사용자는 자율활동 내용과 날짜, 학생의 개별 활동 자료, 기타 요청 사항을 입력할 것입니다."
     "사용자에게는 '사이버폭력예방교육(2025.03.10.)' 같은 양식으로 자율활동 내용(날짜)를 입력하도록 안내했습니다. 만약 사용자가 자율활동 내용과 날짜를 입력하지 않았다면, 양식에 맞게 제시해달라고 안내하세요."
@@ -92,14 +83,12 @@ activity_prompt = (
     "위의 예시와 같이 자율활동 내용과 날짜를 예시의 양식 그대로 지키면서 최대한 풍성하게 써야 합니다. (가능하면 10줄 이상)"
 )
 
-# 교과세특 추가 프롬프트
 subject_prompt = (
     "당신은 생기부 교과세특 내용을 생성하는 ai입니다. 사용자는 교과세특 활동 내용에 관한 간략한 설명, 학생의 개별 활동 자료, 기타 요청 사항를 입력할 것입니다."
     "문장을 시작할 때 절대로 '이 학생은' 또는 '학생은'이라는 말로 시작하면 안 됩니다."
     "학생의 개별 활동 자료를 중심으로 최대한 풍부하게 교과 세특을 생성하세요. (가능하면 10줄 이상)"
 )
 
-# GPT 응답 함수
 def get_chatgpt_response(prompt, key):
     st.session_state[key].append({"role": "user", "content": prompt})
     response = client.chat.completions.create(
@@ -110,7 +99,6 @@ def get_chatgpt_response(prompt, key):
     st.session_state[key].append({"role": "assistant", "content": answer})
     return answer
 
-# Streamlit 앱 UI 설정
 st.set_page_config(
     page_title="생기부 자동 생성기",
     page_icon="💫",
@@ -135,10 +123,8 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# 탭 구성을 4개로 확장
 tab1, tab2, tab3, tab4 = st.tabs(["창체 생기부 생성", "교과세특 생기부 생성", "행발 생기부 생성", "이미지 텍스트 추출"])
 
-# --- 탭 1: 창체 생기부 생성 ---
 with tab1:
     st.subheader("창체 생기부 생성")
     if "messages_tab1" not in st.session_state:
@@ -210,8 +196,6 @@ with tab1:
                 </button>
             """, height=40)
 
-
-# --- 탭 2: 교과세특 생기부 생성 ---
 with tab2:
     st.subheader("교과세특 생기부 생성")
     if "messages_tab2" not in st.session_state:
@@ -283,8 +267,6 @@ with tab2:
                 </button>
             """, height=40)
 
-
-# --- 탭 3: 행발 생기부 생성 ---
 with tab3:
     st.subheader("행발 생기부 생성")
     if "messages_tab3" not in st.session_state:
@@ -348,7 +330,6 @@ with tab3:
                 </button>
             """, height=40)
 
-# --- 탭 4: 이미지 및 PDF 텍스트 추출 ---
 with tab4:
     st.subheader("이미지 및 PDF 텍스트 추출")
     st.info(
@@ -357,24 +338,20 @@ with tab4:
         "* **PDF 파일**: 업로드 후 원하는 페이지를 확인하고 선택하여 개별적으로 텍스트를 추출할 수 있습니다."
     )
     
-    # 💡 세션 상태에 PDF 추출 결과를 저장할 딕셔너리 초기화
     if "pdf_extracted_texts" not in st.session_state:
         st.session_state["pdf_extracted_texts"] = {}
     
-    # 파일 업로더 형식
     uploaded_file = st.file_uploader("텍스트를 추출할 이미지 또는 PDF 파일 업로드", type=["png", "jpg", "jpeg", "pdf"])
     
     if uploaded_file is not None:
         file_type = uploaded_file.type
         
-        # 1. PDF 파일 처리 구문 (페이지별 분절 및 선택형 OCR)
         if file_type == "application/pdf":
             st.write(f"📄 업로드된 문서: **{uploaded_file.name}**")
             
             with st.spinner("PDF 파일을 페이지별로 변환하는 중입니다..."):
                 try:
                     from pdf2image import convert_from_bytes
-                    # PDF 바이너리를 이미지 리스트로 변환
                     pdf_bytes = uploaded_file.read()
                     pages = convert_from_bytes(pdf_bytes)
                     st.success(f"총 {len(pages)}개의 페이지를 분석했습니다. 변환할 페이지를 선택하세요.")
@@ -382,25 +359,20 @@ with tab4:
                     st.error(f"PDF 페이지 분할 중 오류가 발생했습니다: {e}")
                     pages = []
 
-            # 각 페이지를 루프 돌며 화면에 배치
             for idx, page_image in enumerate(pages):
                 page_num = idx + 1
                 
-                # 가로 구분선과 함께 페이지 넘버링 표시
                 st.markdown(f"---")
                 
-                # Streamlit 컬럼 레이아웃을 활용해 왼쪽은 이미지(썸네일), 오른쪽은 조작 및 결과창 배치
                 col1, col2 = st.columns([1, 2])
                 
                 with col1:
                     st.markdown(f"**📄 {page_num}번 페이지**")
                     st.image(page_image, caption=f"{page_num}쪽", use_container_width=True)
                     
-                    # unique한 key를 주기 위해 idx 활용
                     extract_btn = st.button(f"🔍 {page_num}쪽 텍스트 추출하기", key=f"btn_pdf_{idx}")
                 
                 with col2:
-                    # 버튼이 클릭되었을 때 세션 상태에 결과 저장
                     if extract_btn:
                         with st.spinner(f"{page_num}쪽 글자를 분석하는 중입니다..."):
                             try:
@@ -411,20 +383,16 @@ with tab4:
                                         "이 이미지에 적힌 모든 글자를 분석해서 그대로 텍스트로 추출해줘. 다른 설명이나 인사말은 절대 하지 말고 오직 추출된 텍스트만 보여줘."
                                     ]
                                 )
-                                # 💡 추출 결과를 세션 상태에 페이지 번호를 키값으로 저장합니다.
                                 st.session_state["pdf_extracted_texts"][page_num] = response_gemini.text
                             except Exception as e:
                                 st.error(f"Gemini API 통신 오류: {e}")
                     
-                    # 💡 세션 상태에 해당 페이지의 추출 결과가 존재한다면 화면에 항상 그려줍니다.
                     if page_num in st.session_state["pdf_extracted_texts"]:
                         extracted_text = st.session_state["pdf_extracted_texts"][page_num]
                         
-                        # 결과 출력
                         st.write(f"**✨ {page_num}쪽 추출 결과:**")
                         st.info(extracted_text)
                         
-                        # 복사 버튼 생성
                         escaped_text = extracted_text.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
                         st.components.v1.html(f"""
                             <button id="copyBtn_pdf_{idx}" onclick="
@@ -443,9 +411,7 @@ with tab4:
                             </button>
                         """, height=45)
 
-        # 2. 일반 이미지 파일 처리 구문
         else:
-            # (기존 이미지 처리 코드는 그대로 유지하시면 됩니다)
             st.write(f"📄 업로드된 문서: **{uploaded_file.name}**")
             extracted_text = ""
             
