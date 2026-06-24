@@ -20,7 +20,7 @@ st.set_page_config(
 
 st.markdown(
     """
-    <h1 style="text-align: center;">서술형 평가 자동 채점 시스템 [GPT]</h1>
+    <h1 style="text-align: center;">서술형 평가 자동 채점 시스템</h1>
     """, 
     unsafe_allow_html=True
 )
