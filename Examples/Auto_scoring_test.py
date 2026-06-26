@@ -4,14 +4,15 @@ import time
 import pandas as pd
 import io
 from dotenv import load_dotenv
-from openai import OpenAI
+from google import genai
+from google.genai import types
 from PIL import Image
 
 # 환경 변수 로드 및 초기화
 load_dotenv()
-OPENAI_API_KEY = st.secrets.get("OPENAI_API_KEY", os.getenv("OPENAI_API_KEY"))
-openai_client = OpenAI(api_key=OPENAI_API_KEY)
-MODEL_NAME = "gpt-5.5"
+GOOGLE_API_KEY = st.secrets.get("GOOGLE_API_KEY", os.getenv("GOOGLE_API_KEY"))
+gemini_client = genai.Client(api_key=GOOGLE_API_KEY)
+MODEL_NAME = "gemini-3.5-flash"
 
 # Streamlit 앱 UI 설정
 st.set_page_config(
@@ -23,7 +24,7 @@ st.set_page_config(
 # --- 상단 타이틀 및 인용구 (고정 배치) ---
 st.markdown(
     """
-    <h1 style="text-align: center;">서술형 평가 자동 채점 시스템 [GPT]</h1>
+    <h1 style="text-align: center;">서술형 평가 자동 채점 시스템 [Gemini]</h1>
     """, 
     unsafe_allow_html=True
 )
@@ -104,10 +105,14 @@ with tab_left:
                 f"[채점 기준]\n{criteria_text}\n\n"
                 f"[정답 인정 또는 오답 처리 항목 (예외 기준)]\n{exception_text}\n\n"
                 f"[출력 양식]\n"
-                f"반드시 다음 3가지 항목 양식에 맞춰 응답하세요. 다른 인사말이나 불필요한 텍스트는 절대 생략합니다.\n"
+                f"반드시 다음 3가지 항목 양식에 맞춰 응답하세요. 다른 인사말이나 불필요한 텍스트는 절대 생략합니다.\n\n"
                 f"1. 채점 항목별 채점 결과와 세부 근거:\n"
-                f"2. 총점: (기본점수와 감점 요인을 계산한 최종 점수)\n"
-                f"3. 학생에게 제공할 피드백:"
+                f"개별 항목명) [획득점수]점 / [배점]점\n"
+                f"- 채점 근거: [정답 요인 또는 감점 사유 설명]\n\n"
+                f"2. 총점:\n"
+                f"최종 점수: [최종 점수]점 (만점: {max_score}점 / 기본 점수: {base_score}점)\n\n"
+                f"3. 학생에게 제공할 피드백:\n"
+                f"- [학생이 이해한 부분과 부족한 개념을 명확하게 요약한 피드백 작성]"
             )
             st.success("✅ 채점 기준 프롬프트가 최신 상태로 생성/수정되었습니다!")
 
@@ -116,11 +121,13 @@ with tab_left:
 with tab_right:
     st.subheader("📂 학생 답안지 채점 진행")
     
-    # 설정이 먼저 완료되었는지 검증
-    if not st.session_state["system_prompt"]:
+    # 설정 완료 여부에 따라 활성화 상태 및 가이드 텍스트 결정
+    is_ready = bool(st.session_state["system_prompt"])
+    
+    if not is_ready:
         st.warning("⚠️ 먼저 왼쪽의 '⚙️ 채점 기준 설정' 탭에서 [업데이트] 버튼을 눌러 초기 설정을 진행해 주세요.")
     
-    uploaded_file = st.file_uploader("학생들의 답안지 PDF 파일을 업로드하세요.", type=["pdf"])
+    uploaded_file = st.file_uploader("학생들의 답안지 PDF 파일을 업로드하세요.", type=["pdf"], disabled=not is_ready)
 
     # 파일이 새로 업로드되면 기존 페이지 변환 기록 초기화
     if uploaded_file is not None:
@@ -162,35 +169,18 @@ with tab_right:
                         student_pages = pages[start_page:end_page]
                         
                         try:
-                            messages_payload = [
-                                {"role": "system", "content": st.session_state['system_prompt']}
-                            ]
-                            
-                            user_contents = []
-                            for page_img in student_pages:
-                                buffered = io.BytesIO()
-                                page_img.save(buffered, format="PNG")
-                                import base64
-                                img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
-                                user_contents.append({
-                                    "type": "image_url",
-                                    "image_url": {"url": f"data:image/png;base64,{img_base64}"}
-                                })
-                            
-                            user_contents.append({
-                                "type": "text",
-                                "text": f"위 이미지 파일들은 학생 {student_num}의 서술형 답안지입니다. 기준에 맞게 채점하세요."
-                            })
-                            
-                            messages_payload.append({"role": "user", "content": user_contents})
-                            
-                            response = openai_client.chat.completions.create(
-                                model=MODEL_NAME,
-                                messages=messages_payload
+                            contents_payload = list(student_pages)
+                            contents_payload.append(
+                                f"{st.session_state['system_prompt']}\n\n위 이미지 파일들은 학생 {student_num}의 서술형 답안지입니다. 기준에 맞게 채점하세요."
                             )
-                            st.session_state["grading_results"][student_num] = response.choices[0].message.content
+                            
+                            response = gemini_client.models.generate_content(
+                                model=MODEL_NAME,
+                                contents=contents_payload
+                            )
+                            st.session_state["grading_results"][student_num] = response.text
                         except Exception as e:
-                            st.error(f"학생 {student_num} 채점 중 OpenAI API 오류 발생: {e}")
+                            st.error(f"학생 {student_num} 채점 중 Gemini API 오류 발생: {e}")
                         
                         # 진행 바 업데이트
                         bulk_progress.progress((s_idx + 1) / total_students)
@@ -256,36 +246,19 @@ with tab_right:
                     if start_grading:
                         with st.spinner(f"학생 {student_num}의 답안 분석 중..."):
                             try:
-                                messages_payload = [
-                                    {"role": "system", "content": st.session_state['system_prompt']}
-                                ]
-                                
-                                user_contents = []
-                                for page_img in student_pages:
-                                    buffered = io.BytesIO()
-                                    page_img.save(buffered, format="PNG")
-                                    import base64
-                                    img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
-                                    user_contents.append({
-                                        "type": "image_url",
-                                        "image_url": {"url": f"data:image/png;base64,{img_base64}"}
-                                    })
-                                
-                                user_contents.append({
-                                    "type": "text",
-                                    "text": f"위 이미지 파일들은 학생 {student_num}의 서술형 답안지입니다. 기준에 맞게 채점하세요."
-                                })
-                                
-                                messages_payload.append({"role": "user", "content": user_contents})
-                                
-                                response = openai_client.chat.completions.create(
-                                    model=MODEL_NAME,
-                                    messages=messages_payload
+                                contents_payload = list(student_pages)
+                                contents_payload.append(
+                                    f"{st.session_state['system_prompt']}\n\n위 이미지 파일들은 학생 {student_num}의 서술형 답안지입니다. 기준에 맞게 채점하세요."
                                 )
-                                st.session_state["grading_results"][student_num] = response.choices[0].message.content
+                                
+                                response = gemini_client.models.generate_content(
+                                    model=MODEL_NAME,
+                                    contents=contents_payload
+                                )
+                                st.session_state["grading_results"][student_num] = response.text
                                 st.rerun()
                             except Exception as e:
-                                st.error(f"OpenAI API 통신 오류: {e}")
+                                st.error(f"Gemini API 통신 오류: {e}")
 
                     # 채점 결과 렌더링
                     if student_num in st.session_state["grading_results"]:
@@ -318,10 +291,14 @@ with tab_right:
                                     f"[채점 기준]\n{st.session_state['grading_criteria']['criteria_text']}\n\n"
                                     f"[정답 인정 또는 오답 처리 항목 (예외 기준)]\n{updated_exceptions}\n\n"
                                     f"[출력 양식]\n"
-                                    f"반드시 다음 3가지 항목 양식에 맞춰 응답하세요. 다른 인사말은 생략합니다.\n"
+                                    f"반드시 다음 3가지 항목 양식에 맞춰 응답하세요. 다른 인사말은 생략합니다.\n\n"
                                     f"1. 채점 항목별 채점 결과와 세부 근거:\n"
+                                    f"개별 항목명) [획득점수]점 / [배점]점\n"
+                                    f"- 채점 근거: [정답 요인 또는 감점 사유 설명]\n\n"
                                     f"2. 총점:\n"
-                                    f"3. 학생에게 제공할 피드백:"
+                                    f"최종 점수: [최종 점수]점 (만점: {st.session_state['grading_criteria']['max_score']}점 / 기본 점수: {st.session_state['grading_criteria']['base_score']}점)\n\n"
+                                    f"3. 학생에게 제공할 피드백:\n"
+                                    f"- [학생이 이해한 부분과 부족한 개념을 명확하게 요약한 피드백 작성]"
                                 )
                                 time.sleep(0.5)
                                 msg_placeholder = st.empty()

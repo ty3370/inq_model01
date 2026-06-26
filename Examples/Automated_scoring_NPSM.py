@@ -95,20 +95,26 @@ with tab_left:
                 f"[채점 기준]\n{criteria_text}\n\n"
                 f"[정답 인정 또는 오답 처리 항목 (예외 기준)]\n{exception_text}\n\n"
                 f"[출력 양식]\n"
-                f"반드시 다음 3가지 항목 양식에 맞춰 응답하세요. 다른 인사말이나 불필요한 텍스트는 절대 생략합니다.\n"
+                f"반드시 다음 3가지 항목 양식에 맞춰 응답하세요. 다른 인사말이나 불필요한 텍스트는 절대 생략합니다.\n\n"
                 f"1. 채점 항목별 채점 결과와 세부 근거:\n"
-                f"2. 총점: (기본점수와 감점 요인을 계산한 최종 점수)\n"
-                f"3. 학생에게 제공할 피드백:"
+                f"개별 항목명) [획득점수]점 / [배점]점\n"
+                f"- 채점 근거: [정답 요인 또는 감점 사유 설명]\n\n"
+                f"2. 총점:\n"
+                f"최종 점수: [최종 점수]점 (만점: {max_score}점 / 기본 점수: {base_score}점)\n\n"
+                f"3. 학생에게 제공할 피드백:\n"
+                f"- [학생이 이해한 부분과 부족한 개념을 명확하게 요약한 피드백 작성]"
             )
             st.success("✅ 채점 기준 프롬프트가 최신 상태로 생성/수정되었습니다!")
 
 with tab_right:
     st.subheader("📂 학생 답안지 채점 진행")
     
-    if not st.session_state["system_prompt"]:
+    is_ready = bool(st.session_state["system_prompt"])
+    
+    if not is_ready:
         st.warning("⚠️ 먼저 왼쪽의 '⚙️ 채점 기준 설정' 탭에서 [업데이트] 버튼을 눌러 초기 설정을 진행해 주세요.")
     
-    uploaded_file = st.file_uploader("학생들의 답안지 PDF 파일을 업로드하세요.", type=["pdf"])
+    uploaded_file = st.file_uploader("학생들의 답안지 PDF 파일을 업로드하세요.", type=["pdf"], disabled=not is_ready)
 
     if uploaded_file is not None:
         if "last_uploaded_filename" not in st.session_state or st.session_state["last_uploaded_filename"] != uploaded_file.name:
@@ -288,10 +294,14 @@ with tab_right:
                                     f"[채점 기준]\n{st.session_state['grading_criteria']['criteria_text']}\n\n"
                                     f"[정답 인정 또는 오답 처리 항목 (예외 기준)]\n{updated_exceptions}\n\n"
                                     f"[출력 양식]\n"
-                                    f"반드시 다음 3가지 항목 양식에 맞춰 응답하세요. 다른 인사말은 생략합니다.\n"
+                                    f"반드시 다음 3가지 항목 양식에 맞춰 응답하세요. 다른 인사말은 생략합니다.\n\n"
                                     f"1. 채점 항목별 채점 결과와 세부 근거:\n"
+                                    f"개별 항목명) [획득점수]점 / [배점]점\n"
+                                    f"- 채점 근거: [정답 요인 또는 감점 사유 설명]\n\n"
                                     f"2. 총점:\n"
-                                    f"3. 학생에게 제공할 피드백:"
+                                    f"최종 점수: [최종 점수]점 (만점: {st.session_state['grading_criteria']['max_score']}점 / 기본 점수: {st.session_state['grading_criteria']['base_score']}점)\n\n"
+                                    f"3. 학생에게 제공할 피드백:\n"
+                                    f"- [학생이 이해한 부분과 부족한 개념을 명확하게 요약한 피드백 작성]"
                                 )
                                 time.sleep(0.5)
                                 msg_placeholder = st.empty()
