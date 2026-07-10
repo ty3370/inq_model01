@@ -143,9 +143,6 @@ with tab_right:
         if pages:
             total_students = (len(pages) + p_per_student - 1) // p_per_student
             st.info(f"총 {len(pages)}쪽 분석 완료 ➡️ 학생 1인당 {p_per_student}장씩 묶어 총 {total_students}명의 학생 답안지를 배치했습니다.")
-
-            # 일괄 채점 버튼 및 로직이 존재하던 구역을 비워두었습니다.
-                
             st.markdown("---")
             st.subheader("📊 채점 결과 내보내기")
             
