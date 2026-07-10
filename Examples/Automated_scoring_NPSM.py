@@ -5,12 +5,19 @@ import pandas as pd
 import io
 from dotenv import load_dotenv
 from openai import OpenAI
+from google import genai
+from google.genai import types
 from PIL import Image
 
 load_dotenv()
 OPENAI_API_KEY = st.secrets.get("OPENAI_API_KEY", os.getenv("OPENAI_API_KEY"))
+GOOGLE_API_KEY = st.secrets.get("GOOGLE_API_KEY", os.getenv("GOOGLE_API_KEY"))
+
 openai_client = OpenAI(api_key=OPENAI_API_KEY)
-MODEL_NAME = "gpt-5.5"
+gemini_client = genai.Client(api_key=GOOGLE_API_KEY)
+
+MODEL_GPT = "gpt-5.5"
+MODEL_GEMINI = "gemini-3.1-pro-preview"
 
 st.set_page_config(
     page_title="서술형 평가 자동 채점 시스템",
@@ -137,52 +144,8 @@ with tab_right:
             total_students = (len(pages) + p_per_student - 1) // p_per_student
             st.info(f"총 {len(pages)}쪽 분석 완료 ➡️ 학생 1인당 {p_per_student}장씩 묶어 총 {total_students}명의 학생 답안지를 배치했습니다.")
 
-            start_bulk_grading = st.button("🔍 모든 학생 일괄 채점 시작", key="btn_bulk_grade", type="primary")
-            
-            if start_bulk_grading:
-                bulk_progress = st.progress(0)
-                with st.spinner("모든 학생에 대한 일괄 채점을 진행 중입니다..."):
-                    for s_idx in range(total_students):
-                        student_num = s_idx + 1
-                        
-                        start_page = s_idx * p_per_student
-                        end_page = min(start_page + p_per_student, len(pages))
-                        student_pages = pages[start_page:end_page]
-                        
-                        try:
-                            messages_payload = [
-                                {"role": "system", "content": st.session_state['system_prompt']}
-                            ]
-                            
-                            user_contents = []
-                            for page_img in student_pages:
-                                buffered = io.BytesIO()
-                                page_img.save(buffered, format="PNG")
-                                import base64
-                                img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
-                                user_contents.append({
-                                    "type": "image_url",
-                                    "image_url": {"url": f"data:image/png;base64,{img_base64}"}
-                                })
-                            
-                            user_contents.append({
-                                "type": "text",
-                                "text": f"위 이미지 파일들은 학생 {student_num}의 서술형 답안지입니다. 기준에 맞게 채점하세요."
-                            })
-                            
-                            messages_payload.append({"role": "user", "content": user_contents})
-                            
-                            response = openai_client.chat.completions.create(
-                                model=MODEL_NAME,
-                                messages=messages_payload
-                            )
-                            st.session_state["grading_results"][student_num] = response.choices[0].message.content
-                        except Exception as e:
-                            st.error(f"학생 {student_num} 채점 중 OpenAI API 오류 발생: {e}")
-                        
-                        bulk_progress.progress((s_idx + 1) / total_students)
-                st.success("🎉 모든 학생의 일괄 채점이 완료되었습니다!")
-                st.rerun()
+            # 일괄 채점 버튼 및 로직이 존재하던 구역을 비워두었습니다.
+                
             st.markdown("---")
             st.subheader("📊 채점 결과 내보내기")
             
@@ -230,41 +193,53 @@ with tab_right:
                 res_col, side_col = st.columns([2, 1])
                 
                 with res_col:
-                    start_grading = st.button(f"🔍 학생 {student_num} 개별 채점", key=f"btn_grade_{student_num}")
+                    col_single_gpt, col_single_gemini = st.columns(2)
+                    start_grading_gpt = col_single_gpt.button(f"🔍 [gpt-5.5 사용 채점] (그림/그래프 인식 우수)", key=f"btn_grade_gpt_{student_num}", use_container_width=True)
+                    start_grading_gemini = col_single_gemini.button(f"🔍 [gemini-3.1-pro 사용 채점] (손글씨 인식 우수)", key=f"btn_grade_gemini_{student_num}", use_container_width=True)
                     
-                    if start_grading:
-                        with st.spinner(f"학생 {student_num}의 답안 분석 중..."):
+                    if start_grading_gpt or start_grading_gemini:
+                        selected_single_model = "gpt" if start_grading_gpt else "gemini"
+                        with st.spinner(f"학생 {student_num}의 답안 분석 중({selected_single_model.upper()})..."):
                             try:
-                                messages_payload = [
-                                    {"role": "system", "content": st.session_state['system_prompt']}
-                                ]
-                                
-                                user_contents = []
-                                for page_img in student_pages:
-                                    buffered = io.BytesIO()
-                                    page_img.save(buffered, format="PNG")
-                                    import base64
-                                    img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+                                if selected_single_model == "gpt":
+                                    messages_payload = [
+                                        {"role": "system", "content": st.session_state['system_prompt']}
+                                    ]
+                                    user_contents = []
+                                    for page_img in student_pages:
+                                        buffered = io.BytesIO()
+                                        page_img.save(buffered, format="PNG")
+                                        import base64
+                                        img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+                                        user_contents.append({
+                                            "type": "image_url",
+                                            "image_url": {"url": f"data:image/png;base64,{img_base64}"}
+                                        })
                                     user_contents.append({
-                                        "type": "image_url",
-                                        "image_url": {"url": f"data:image/png;base64,{img_base64}"}
+                                        "type": "text",
+                                        "text": f"위 이미지 파일들은 학생 {student_num}의 서술형 답안지입니다. 기준에 맞게 채점하세요."
                                     })
+                                    messages_payload.append({"role": "user", "content": user_contents})
+                                    response = openai_client.chat.completions.create(
+                                        model=MODEL_GPT,
+                                        messages=messages_payload
+                                    )
+                                    st.session_state["grading_results"][student_num] = response.choices[0].message.content
                                 
-                                user_contents.append({
-                                    "type": "text",
-                                    "text": f"위 이미지 파일들은 학생 {student_num}의 서술형 답안지입니다. 기준에 맞게 채점하세요."
-                                })
-                                
-                                messages_payload.append({"role": "user", "content": user_contents})
-                                
-                                response = openai_client.chat.completions.create(
-                                    model=MODEL_NAME,
-                                    messages=messages_payload
-                                )
-                                st.session_state["grading_results"][student_num] = response.choices[0].message.content
+                                elif selected_single_model == "gemini":
+                                    contents_payload = list(student_pages)
+                                    contents_payload.append(
+                                        f"{st.session_state['system_prompt']}\n\n위 이미지 파일들은 학생 {student_num}의 서술형 답안지입니다. 기준에 맞게 채점하세요."
+                                    )
+                                    response = gemini_client.models.generate_content(
+                                        model=MODEL_GEMINI,
+                                        contents=contents_payload
+                                    )
+                                    st.session_state["grading_results"][student_num] = response.text
+                                    
                                 st.rerun()
                             except Exception as e:
-                                st.error(f"OpenAI API 통신 오류: {e}")
+                                st.error(f"API 통신 오류: {e}")
 
                     if student_num in st.session_state["grading_results"]:
                         st.write(f"**학생 {student_num} 채점 결과**")
