@@ -17,7 +17,8 @@ openai_client = OpenAI(api_key=OPENAI_API_KEY)
 gemini_client = genai.Client(api_key=GOOGLE_API_KEY)
 
 MODEL_GPT = "gpt-5.5"
-MODEL_GEMINI = "gemini-3.1-pro-preview"
+MODEL_GEMINI_PRO = "gemini-3.1-pro-preview"
+MODEL_GEMINI_FLASH = "gemini-3.5-flash"
 
 st.set_page_config(
     page_title="서술형 평가 자동 채점 시스템",
@@ -190,13 +191,20 @@ with tab_right:
                 res_col, side_col = st.columns([2, 1])
                 
                 with res_col:
-                    col_single_gpt, col_single_gemini = st.columns(2)
-                    start_grading_gpt = col_single_gpt.button(f"🔍 [gpt-5.5 사용 채점] (그림/그래프 인식 우수)", key=f"btn_grade_gpt_{student_num}", use_container_width=True)
-                    start_grading_gemini = col_single_gemini.button(f"🔍 [gemini-3.1-pro 사용 채점] (손글씨 인식 우수)", key=f"btn_grade_gemini_{student_num}", use_container_width=True)
+                    col_btn1, col_btn2, col_btn3, col_btn_rest = st.columns([0.25, 0.28, 0.29, 0.18])
+                    start_grading_gpt = col_btn1.button("gpt-5.5로 채점하기", key=f"btn_grade_gpt_{student_num}", use_container_width=True, help="📊 그림/그래프 인식 우수")
+                    start_grading_gemini = col_btn2.button("gemini-3.1-pro로 채점하기", key=f"btn_grade_gemini_{student_num}", use_container_width=True, help="✍️ 손글씨 인식 우수")
+                    start_grading_flash = col_btn3.button("gemini-3.5-flash로 채점하기", key=f"btn_grade_flash_{student_num}", use_container_width=True, help="⚡ 속도 빠름")
                     
-                    if start_grading_gpt or start_grading_gemini:
-                        selected_single_model = "gpt" if start_grading_gpt else "gemini"
-                        with st.spinner(f"학생 {student_num}의 답안 분석 중({selected_single_model.upper()})..."):
+                    if start_grading_gpt or start_grading_gemini or start_grading_flash:
+                        if start_grading_gpt:
+                            selected_single_model = "gpt"
+                        elif start_grading_gemini:
+                            selected_single_model = "gemini_pro"
+                        else:
+                            selected_single_model = "gemini_flash"
+                            
+                        with st.spinner(f"학생 {student_num}의 답안 분석 중..."):
                             try:
                                 if selected_single_model == "gpt":
                                     messages_payload = [
@@ -223,13 +231,24 @@ with tab_right:
                                     )
                                     st.session_state["grading_results"][student_num] = response.choices[0].message.content
                                 
-                                elif selected_single_model == "gemini":
+                                elif selected_single_model == "gemini_pro":
                                     contents_payload = list(student_pages)
                                     contents_payload.append(
                                         f"{st.session_state['system_prompt']}\n\n위 이미지 파일들은 학생 {student_num}의 서술형 답안지입니다. 기준에 맞게 채점하세요."
                                     )
                                     response = gemini_client.models.generate_content(
-                                        model=MODEL_GEMINI,
+                                        model=MODEL_GEMINI_PRO,
+                                        contents=contents_payload
+                                    )
+                                    st.session_state["grading_results"][student_num] = response.text
+                                    
+                                elif selected_single_model == "gemini_flash":
+                                    contents_payload = list(student_pages)
+                                    contents_payload.append(
+                                        f"{st.session_state['system_prompt']}\n\n위 이미지 파일들은 학생 {student_num}의 서술형 답안지입니다. 기준에 맞게 채점하세요."
+                                    )
+                                    response = gemini_client.models.generate_content(
+                                        model=MODEL_GEMINI_FLASH,
                                         contents=contents_payload
                                     )
                                     st.session_state["grading_results"][student_num] = response.text
