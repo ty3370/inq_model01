@@ -191,7 +191,7 @@ with tab_right:
                 res_col, side_col = st.columns([2, 1])
                 
                 with res_col:
-                    _, col_btn1, col_btn2, col_btn3 = st.columns([0.05, 0.3, 0.32, 0.33])
+                    col_btn1, col_btn2, col_btn3, col_btn_rest = st.columns([0.25, 0.28, 0.29, 0.18])
                     start_grading_gpt = col_btn1.button("gpt-5.5로 채점하기", key=f"btn_grade_gpt_{student_num}", use_container_width=True, help="그림/그래프 인식 우수")
                     start_grading_gemini = col_btn2.button("gemini-3.1-pro로 채점하기", key=f"btn_grade_gemini_{student_num}", use_container_width=True, help="손글씨 인식 우수")
                     start_grading_flash = col_btn3.button("gemini-3.5-flash로 채점하기", key=f"btn_grade_flash_{student_num}", use_container_width=True, help="속도 빠름")
