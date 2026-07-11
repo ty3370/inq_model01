@@ -204,7 +204,7 @@ with tab_right:
                         else:
                             selected_single_model = "gemini_flash"
                             
-                        with st.spinner(f"학생 {student_num}의 답안 분석 중({selected_single_model.upper()})..."):
+                        with st.spinner(f"학생 {student_num}의 답안 분석 중..."):
                             try:
                                 if selected_single_model == "gpt":
                                     messages_payload = [
