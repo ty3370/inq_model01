@@ -191,10 +191,10 @@ with tab_right:
                 res_col, side_col = st.columns([2, 1])
                 
                 with res_col:
-                    col_single_gpt, col_single_gemini, col_single_flash = st.columns(3)
-                    start_grading_gpt = col_single_gpt.button(f"gpt-5.5 채점\n(그림/그래프 우수)", key=f"btn_grade_gpt_{student_num}", use_container_width=True)
-                    start_grading_gemini = col_single_gemini.button(f"gemini-3.1-pro 채점\n(손글씨 우수)", key=f"btn_grade_gemini_{student_num}", use_container_width=True)
-                    start_grading_flash = col_single_flash.button(f"gemini-3.5-flash 채점\n(속도 빠름)", key=f"btn_grade_flash_{student_num}", use_container_width=True)
+                    _, col_btn1, col_btn2, col_btn3, _ = st.columns([0.1, 1.0, 1.0, 1.0, 0.1])
+                    start_grading_gpt = col_btn1.button("gpt-5.5로 채점하기", key=f"btn_grade_gpt_{student_num}", use_container_width=True, help="그림/그래프 인식 우수")
+                    start_grading_gemini = col_btn2.button("gemini-3.1-pro로 채점하기", key=f"btn_grade_gemini_{student_num}", use_container_width=True, help="손글씨 인식 우수")
+                    start_grading_flash = col_btn3.button("gemini-3.5-flash로 채점하기", key=f"btn_grade_flash_{student_num}", use_container_width=True, help="속도 빠름")
                     
                     if start_grading_gpt or start_grading_gemini or start_grading_flash:
                         if start_grading_gpt:
