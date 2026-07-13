@@ -490,4 +490,3 @@ with tab4:
                     추출된 텍스트 복사하기
                     </button>
                 """, height=45)
-}
