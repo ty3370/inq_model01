@@ -129,16 +129,12 @@ with tab1:
     st.subheader("창체 생기부 생성")
     if "messages_tab1" not in st.session_state:
         st.session_state["messages_tab1"] = [{"role": "system", "content": initial_prompt + activity_prompt}]
-    
     st.info("창체 내용과 날짜, 개별 활동 자료, 요청 사항을 입력하여 창체 생기부를 생성합니다.")
-    
     with st.form(key='form_tab1', clear_on_submit=False):
         act_date = st.text_input("창체 내용과 날짜:", placeholder="예시: 사이버폭력예방교육(2025.03.10.)", key="act_date")
         act_student_data = st.text_area("학생의 개별 활동 자료(정리되지 않은 형태도 가능):", placeholder="예시: 온라인 예절의 중요성에 관해 이러이러한 내용 작성", key="act_student_data")
         act_etc = st.text_input("기타 요청 사항:", placeholder="예시: 의사소통 역량 강조", key="act_etc")
-        
         submit_button1 = st.form_submit_button("생기부 생성")
-        
         if submit_button1:
             if not act_date or not act_student_data or not act_etc:
                 st.warning("모든 내용을 입력해 주세요.")
@@ -149,10 +145,8 @@ with tab1:
                     f"기타 요청 사항: {act_etc}"
                 )
                 response = get_chatgpt_response(formatted_prompt, "messages_tab1")
-                
                 st.write("**생기부 생성 결과:**")
                 st.info(response)
-                
                 escaped_res = response.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
                 st.components.v1.html(f"""
                     <button id="copyBtn1" onclick="
@@ -170,7 +164,6 @@ with tab1:
                     생기부 내용 복사하기
                     </button>
                 """, height=45)
-            
     st.subheader("생성 기록 (창체)")
     for i, message in enumerate(st.session_state["messages_tab1"]):
         if message["role"] == "user":
@@ -200,16 +193,12 @@ with tab2:
     st.subheader("교과세특 생기부 생성")
     if "messages_tab2" not in st.session_state:
         st.session_state["messages_tab2"] = [{"role": "system", "content": initial_prompt + subject_prompt}]
-        
     st.info("교과 활동 내용의 간략한 설명, 개별 활동 자료, 요청 사항을 입력하여 교과세특 생기부를 생성합니다.")
-    
     with st.form(key='form_tab2', clear_on_submit=False):
         sub_desc = st.text_input("교과세특 활동 내용에 관한 간략한 설명:", placeholder="예시: 운동량과 충격량 전환이 적용된 사례 발표", key="sub_desc")
         sub_student_data = st.text_area("학생의 개별 활동 자료(정리되지 않은 형태도 가능):", placeholder="예시: 안전모의 원리에 대해 이러이러한 내용 발표", key="sub_student_data")
         sub_etc = st.text_input("기타 요청 사항:", placeholder="예시: 과학적 사고력과 창의성 강조", key="sub_etc")
-        
         submit_button2 = st.form_submit_button("생기부 생성")
-        
         if submit_button2:
             if not sub_desc or not sub_student_data or not sub_etc:
                 st.warning("모든 내용을 입력해 주세요.")
@@ -220,10 +209,8 @@ with tab2:
                     f"기타 요청 사항: {sub_etc}"
                 )
                 response = get_chatgpt_response(formatted_prompt, "messages_tab2")
-                
                 st.write("**생기부 생성 결과:**")
                 st.info(response)
-                
                 escaped_res = response.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
                 st.components.v1.html(f"""
                     <button id="copyBtn2" onclick="
@@ -241,7 +228,6 @@ with tab2:
                     생기부 내용 복사하기
                     </button>
                 """, height=45)
-            
     st.subheader("생성 기록 (교과세특)")
     for i, message in enumerate(st.session_state["messages_tab2"]):
         if message["role"] == "user":
@@ -271,22 +257,17 @@ with tab3:
     st.subheader("행발 생기부 생성")
     if "messages_tab3" not in st.session_state:
         st.session_state["messages_tab3"] = [{"role": "system", "content": initial_prompt}]
-        
     st.info("몇 개의 키워드나 정리되지 않은 글을 입력하면 행발 생기부 양식으로 작성해 줍니다.")
-    
     with st.form(key='form_tab3', clear_on_submit=False):
         user_input3 = st.text_area("내용 입력:", key="user_input3")
         submit_button3 = st.form_submit_button("생기부 생성")
-        
         if submit_button3:
             if not user_input3:
                 st.warning("내용을 입력해 주세요.")
             else:
                 response = get_chatgpt_response(user_input3, "messages_tab3")
-                
                 st.write("**생기부 생성 결과:**")
                 st.info(response)
-                
                 escaped_res = response.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
                 st.components.v1.html(f"""
                     <button id="copyBtn3" onclick="
@@ -304,7 +285,6 @@ with tab3:
                     생기부 내용 복사하기
                     </button>
                 """, height=45)
-            
     st.subheader("생성 기록 (행발)")
     for i, message in enumerate(st.session_state["messages_tab3"]):
         if message["role"] == "user":
@@ -337,18 +317,16 @@ with tab4:
         "* **이미지 파일**: 업로드 즉시 전체 텍스트를 추출합니다.\n"
         "* **PDF 파일**: 업로드 후 원하는 페이지를 확인하고 선택하여 개별적으로 텍스트를 추출할 수 있습니다."
     )
-    
     if "pdf_extracted_texts" not in st.session_state:
         st.session_state["pdf_extracted_texts"] = {}
-    
     uploaded_file = st.file_uploader("텍스트를 추출할 이미지 또는 PDF 파일 업로드", type=["png", "jpg", "jpeg", "pdf"])
-    
     if uploaded_file is not None:
         file_type = uploaded_file.type
-        
+        if "last_uploaded_file" not in st.session_state or st.session_state["last_uploaded_file"] != uploaded_file.name:
+            st.session_state["pdf_extracted_texts"] = {}
+            st.session_state["last_uploaded_file"] = uploaded_file.name
         if file_type == "application/pdf":
             st.write(f"📄 업로드된 문서: **{uploaded_file.name}**")
-            
             with st.spinner("PDF 파일을 페이지별로 변환하는 중입니다..."):
                 try:
                     from pdf2image import convert_from_bytes
@@ -358,20 +336,14 @@ with tab4:
                 except Exception as e:
                     st.error(f"PDF 페이지 분할 중 오류가 발생했습니다: {e}")
                     pages = []
-
             for idx, page_image in enumerate(pages):
                 page_num = idx + 1
-                
                 st.markdown(f"---")
-                
                 col1, col2 = st.columns([1, 2])
-                
                 with col1:
                     st.markdown(f"**📄 {page_num}번 페이지**")
                     st.image(page_image, caption=f"{page_num}쪽", use_container_width=True)
-                    
                     extract_btn = st.button(f"🔍 {page_num}쪽 텍스트 추출하기", key=f"btn_pdf_{idx}")
-                
                 with col2:
                     if extract_btn:
                         with st.spinner(f"{page_num}쪽 글자를 분석하는 중입니다..."):
@@ -386,13 +358,10 @@ with tab4:
                                 st.session_state["pdf_extracted_texts"][page_num] = response_gemini.text
                             except Exception as e:
                                 st.error(f"Gemini API 통신 오류: {e}")
-                    
                     if page_num in st.session_state["pdf_extracted_texts"]:
                         extracted_text = st.session_state["pdf_extracted_texts"][page_num]
-                        
                         st.write(f"**✨ {page_num}쪽 추출 결과:**")
                         st.info(extracted_text)
-                        
                         escaped_text = extracted_text.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
                         st.components.v1.html(f"""
                             <button id="copyBtn_pdf_{idx}" onclick="
@@ -410,11 +379,9 @@ with tab4:
                             {page_num}쪽 텍스트 복사하기
                             </button>
                         """, height=45)
-
         else:
             st.write(f"📄 업로드된 문서: **{uploaded_file.name}**")
             extracted_text = ""
-            
             with st.spinner("문서를 읽어오는 중입니다..."):
                 try:
                     image = Image.open(uploaded_file)
@@ -429,11 +396,9 @@ with tab4:
                     st.success("이미지 텍스트 추출 완료!")
                 except Exception as e:
                     st.error(f"Gemini API 통신 오류: {e}")
-            
             if extracted_text:
                 st.write("**텍스트 추출 결과:**")
                 st.info(extracted_text)
-                
                 escaped_text = extracted_text.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n").replace("$", "\\$")
                 st.components.v1.html(f"""
                     <button id="copyBtnOCR" onclick="
