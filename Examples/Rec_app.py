@@ -367,6 +367,11 @@ with tab4:
     if uploaded_file is not None:
         file_type = uploaded_file.type
         
+        # 파일이 새로 업로드되거나 변경되었을 때 이전 OCR 데이터 비우기
+        if "last_uploaded_file" not in st.session_state or st.session_state["last_uploaded_file"] != uploaded_file.name:
+            st.session_state["pdf_extracted_texts"] = {}
+            st.session_state["last_uploaded_file"] = uploaded_file.name
+        
         # 1. PDF 파일 처리 구문 (페이지별 분절 및 선택형 OCR)
         if file_type == "application/pdf":
             st.write(f"📄 업로드된 문서: **{uploaded_file.name}**")
@@ -485,3 +490,4 @@ with tab4:
                     추출된 텍스트 복사하기
                     </button>
                 """, height=45)
+}
