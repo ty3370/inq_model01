@@ -154,7 +154,7 @@ with tab_right:
             st.info(f"총 {len(pages)}쪽 분석 완료 ➡️ 학생 1인당 {p_per_student}장씩 묶어 총 {total_students}명의 학생 답안지를 배치했습니다.")
 
             # --- 모든 학생 일괄 채점 시작 버튼 ---
-            start_bulk_grading = st.button("🔍 일괄 채점 (기능 불안정함)", key="btn_bulk_grade", type="primary", help="⚠️ 이 기능은 서버 부하가 커 불안정할 수 있으므로 가능하면 개별 채점을 추천합니다.") # 일괄 채점 비활성화 시 이 문장을 주석처리
+            start_bulk_grading = st.button("🔍 일괄 채점 [기능 불안정함]", key="btn_bulk_grade", type="primary", help="⚠️ 이 기능은 서버 부하가 커 불안정할 수 있으므로, 가능하면 개별 채점을 추천합니다.") # 일괄 채점 비활성화 시 이 문장을 주석처리
 
 #            start_bulk_grading = False # 일괄 채점 활성화 시 이 문장을 주석처리
             
