@@ -1,10 +1,12 @@
 import streamlit as st
 from openai import OpenAI
 import os
+import io
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from PIL import Image
+import fitz
 
 load_dotenv()
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
@@ -329,9 +331,14 @@ with tab4:
             st.write(f"📄 업로드된 문서: **{uploaded_file.name}**")
             with st.spinner("PDF 파일을 페이지별로 변환하는 중입니다..."):
                 try:
-                    from pdf2image import convert_from_bytes
                     pdf_bytes = uploaded_file.read()
-                    pages = convert_from_bytes(pdf_bytes)
+                    doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+                    pages = []
+                    for page in doc:
+                        matrix = fitz.Matrix(2.0, 2.0)
+                        pix = page.get_pixmap(matrix=matrix)
+                        img = Image.open(io.BytesIO(pix.tobytes("png")))
+                        pages.append(img)
                     st.success(f"총 {len(pages)}개의 페이지를 분석했습니다. 변환할 페이지를 선택하세요.")
                 except Exception as e:
                     st.error(f"PDF 페이지 분할 중 오류가 발생했습니다: {e}")
