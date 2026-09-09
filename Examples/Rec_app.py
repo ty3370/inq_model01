@@ -1,10 +1,12 @@
 import streamlit as st
 from openai import OpenAI
 import os
+import io
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from PIL import Image
+import fitz  # PyMuPDF (OS 바이너리 없이 PDF를 이미지로 변환)
 
 # 환경 변수 로드
 load_dotenv()
@@ -372,16 +374,23 @@ with tab4:
             st.session_state["pdf_extracted_texts"] = {}
             st.session_state["last_uploaded_file"] = uploaded_file.name
         
-        # 1. PDF 파일 처리 구문 (페이지별 분절 및 선택형 OCR)
+        # 1. PDF 파일 처리 구문 (PyMuPDF를 사용하여 OS 레벨 의존성 완전 제거)
         if file_type == "application/pdf":
             st.write(f"📄 업로드된 문서: **{uploaded_file.name}**")
             
             with st.spinner("PDF 파일을 페이지별로 변환하는 중입니다..."):
                 try:
-                    from pdf2image import convert_from_bytes
-                    # PDF 바이너리를 이미지 리스트로 변환
                     pdf_bytes = uploaded_file.read()
-                    pages = convert_from_bytes(pdf_bytes)
+                    doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+                    
+                    pages = []
+                    for page in doc:
+                        # 2배율(선명도 향상)로 렌더링
+                        matrix = fitz.Matrix(2.0, 2.0)
+                        pix = page.get_pixmap(matrix=matrix)
+                        img = Image.open(io.BytesIO(pix.tobytes("png")))
+                        pages.append(img)
+                        
                     st.success(f"총 {len(pages)}개의 페이지를 분석했습니다. 변환할 페이지를 선택하세요.")
                 except Exception as e:
                     st.error(f"PDF 페이지 분할 중 오류가 발생했습니다: {e}")
@@ -392,7 +401,7 @@ with tab4:
                 page_num = idx + 1
                 
                 # 가로 구분선과 함께 페이지 넘버링 표시
-                st.markdown(f"---")
+                st.markdown("---")
                 
                 # Streamlit 컬럼 레이아웃을 활용해 왼쪽은 이미지(썸네일), 오른쪽은 조작 및 결과창 배치
                 col1, col2 = st.columns([1, 2])
@@ -450,7 +459,6 @@ with tab4:
 
         # 2. 일반 이미지 파일 처리 구문
         else:
-            # (기존 이미지 처리 코드는 그대로 유지하시면 됩니다)
             st.write(f"📄 업로드된 문서: **{uploaded_file.name}**")
             extracted_text = ""
             
