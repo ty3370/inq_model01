@@ -4,6 +4,6 @@ python-dotenv
 openai
 google-genai
 pillow
-pdf2image
+PyMuPDF
 pandas
 openpyxl
